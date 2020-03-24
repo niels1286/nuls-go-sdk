@@ -18,7 +18,7 @@
  * SOFTWARE.
  */
 
-package btc
+package eckey
 
 import (
 	"encoding/hex"

@@ -1,4 +1,4 @@
-module nerve-go-sdk
+module github.com/niels1286/nerve-go-sdk
 
 go 1.11
 
