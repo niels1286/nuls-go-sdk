@@ -20,9 +20,23 @@
 
 package account
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAccount(t *testing.T) {
+
+	t.Run("test create account", func(t *testing.T) {
+		account, err := NewNULSAccount()
+		if err != nil {
+			t.Fatalf(err.Error())
+		}
+		//fmt.Println(account.address+"::::::::"+account.eckey.GetPriKeyHex())
+		if account.address == "" {
+			t.Fatalf("create account failed")
+		}
+	})
+
 	t.Run("valid right account", func(t *testing.T) {
 		cases := []string{
 			"NULSd6HgW1XmWzGsAtPaFbFKrfmV7gXmbLc55",
@@ -54,4 +68,10 @@ func TestAccount(t *testing.T) {
 		//	t.Errorf("create account and valid failed.")
 		//}
 	})
+}
+
+func BenchmarkNewNormalAccount(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewNormalAccount(1, "NULS")
+	}
 }

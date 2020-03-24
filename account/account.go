@@ -20,41 +20,94 @@
 package account
 
 import (
-	"crypto/sha256"
+	"github.com/niels1286/nerve-go-sdk/crypto/base58"
 	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
-	"golang.org/x/crypto/ripemd160"
+	cryptoutils "github.com/niels1286/nerve-go-sdk/crypto/utils"
+	"github.com/niels1286/nerve-go-sdk/math"
 )
 
+const (
+	//默认的地址字节长度
+	AddressBytesLength = 23
+	//默认账户类型
+	NormalAccountType = uint8(1)
+	//合约账户类型
+	ContractAccountType = uint8(2)
+	//多签账户类型
+	P2SHAccountType = uint8(3)
+)
+
+//用于前缀和实际地址的分隔符
+var PrefixTable = [...]string{"", "a", "b", "c", "d", "e"}
+
+//NULS大生态体系内的基本账户结构
 type Account struct {
+	//地址，是用户操作的载体，账户余额管理、转账、数据权限等，全有地址来识别
+	//地址的格式为：address = prefix + Base58Encode(chainId+addressType+pkh+xor)
 	address string
+	//NULS是一个多链生态，每一条区块链，都有自己的id，用于在多链交互时，识别所属身份
+	//NULS主网为1，NULS测试网为2
 	chainId uint16
+	//账户类型：1、普通账户，2、合约地址，3、多签地址
 	accType uint8
-	eckey   eckey.EcKey
+	//账户对应的公私钥对
+	eckey eckey.EcKey
+	//加密后的私钥，用于存储
+	cryptedPrkKey string
 }
 
 //创建一个新账户
+//chainId:账户所在链的ID，用于多链交互时，识别身份
+//prefix:地址前缀，每条链都可以定义自己的地址前缀
 func NewNormalAccount(chainId uint16, prefix string) (Account, error) {
 	ec, err := eckey.NewEcKey()
 	if err != nil {
 		return Account{}, err
 	}
 	pubBytes := ec.GetPubKeyBytes(true)
-	digest := sha256.Sum256(pubBytes)
-	digest = ripemd160.New().Sum([]byte{digest})
+	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
+	address := GetStringAddress(addressBytes, prefix)
+	return Account{address: address, chainId: chainId, accType: NormalAccountType, eckey: ec, cryptedPrkKey: ""}, nil
+
+}
+
+//根据地址字节数组，生成可以阅读的字符串地址
+func GetStringAddress(bytes []byte, prefix string) string {
+	//将之前得到的所有字节，进行异或操作，得到结果追加到
+	xor := calcXor(bytes)
+	bytes = append(bytes, xor)
+	return prefix + PrefixTable[len(prefix)] + base58.Encode(bytes)
+}
+
+//根据公钥，生成账户地址
+func GetAddressByPubBytes(bytes []byte, chainId uint16, accountType uint8, prefix string) []byte {
+	hash160 := cryptoutils.Hash160(bytes)
+	addressBytes := []byte{}
+	addressBytes = append(addressBytes, math.Uint16ToBytes(chainId)...)
+	addressBytes = append(addressBytes, accountType)
+	addressBytes = append(addressBytes, hash160...)
+	return addressBytes
+}
+
+//计算异或字节
+func calcXor(bytes []byte) byte {
+	xor := byte(0)
+	for _, one := range bytes {
+		xor ^= one
+	}
+	return xor
 }
 
 func NewNULSAccount() (Account, error) {
-
-}
-
-func NewNerveAccount() (Account, error) {
-
+	return NewNormalAccount(1, "NULS")
 }
 
 func ParseAccount(address string) Account {
-
+	//todo
+	return Account{}
 }
 
 func Valid(address string) bool {
-
+	//todo
+	return false
 }
