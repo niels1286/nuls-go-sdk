@@ -6,7 +6,7 @@ package base58_test
 
 import (
 	"fmt"
-	"github.com/niels1286/nerve-go-sdk/crypto/base58"
+	"github.com/niels1286/nuls-go-sdk/crypto/base58"
 )
 
 // This example demonstrates how to decode modified base58 encoded data.

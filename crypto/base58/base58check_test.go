@@ -5,7 +5,7 @@
 package base58_test
 
 import (
-	"github.com/niels1286/nerve-go-sdk/crypto/base58"
+	"github.com/niels1286/nuls-go-sdk/crypto/base58"
 	"testing"
 )
 

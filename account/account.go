@@ -21,10 +21,10 @@ package account
 
 import (
 	"errors"
-	"github.com/niels1286/nerve-go-sdk/crypto/base58"
-	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
-	cryptoutils "github.com/niels1286/nerve-go-sdk/crypto/utils"
-	"github.com/niels1286/nerve-go-sdk/math"
+	"github.com/niels1286/nuls-go-sdk/crypto/base58"
+	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
+	cryptoutils "github.com/niels1286/nuls-go-sdk/crypto/utils"
+	"github.com/niels1286/nuls-go-sdk/math"
 	"log"
 	"strings"
 )

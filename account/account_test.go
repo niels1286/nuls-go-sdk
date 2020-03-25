@@ -22,7 +22,7 @@ package account
 
 import (
 	"fmt"
-	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
+	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
 	"log"
 	"testing"
 )

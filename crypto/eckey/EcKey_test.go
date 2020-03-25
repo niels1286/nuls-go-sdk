@@ -22,7 +22,7 @@ package eckey
 
 import (
 	"encoding/hex"
-	"nerve-go-sdk/assert"
+	"nuls-go-sdk/assert"
 	"testing"
 )
 
