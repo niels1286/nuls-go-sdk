@@ -42,7 +42,7 @@ func TestBytesToUint16(t *testing.T) {
 	}{
 		{name: "bytes to uint16.a", args: args{[]byte{103, 43}}, want: 11111},
 		{name: "bytes to uint16.b", args: args{[]byte{0, 0}}, want: 0},
-		{name: "bytes to uint16.c", args: args{[]byte{-1, -1}}, want: 65535},
+		{name: "bytes to uint16.c", args: args{[]byte{255, 255}}, want: 65535},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestUint16ToBytes(t *testing.T) {
 		want []byte
 	}{
 		{name: "TestUint16ToBytes.a", args: args{0}, want: []byte{0, 0}},
-		{name: "TestUint16ToBytes.b", args: args{65535}, want: []byte{-1, -1}},
+		{name: "TestUint16ToBytes.b", args: args{65535}, want: []byte{255, 255}},
 		{name: "TestUint16ToBytes.c", args: args{11111}, want: []byte{}},
 	}
 	for _, tt := range tests {
@@ -283,7 +283,11 @@ func TestBytesToVarInt(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
+		{name: "bytesToVarInt.a", args: args{bytes: VarIntToBytes(0)}, want: 0},
+		{name: "bytesToVarInt.b", args: args{bytes: VarIntToBytes(1)}, want: 1},
+		{name: "bytesToVarInt.c", args: args{bytes: VarIntToBytes(65536)}, want: 65535},
+		{name: "bytesToVarInt.d", args: args{bytes: VarIntToBytes(2147483647)}, want: 2147483647},
+		{name: "bytesToVarInt.e", args: args{bytes: VarIntToBytes(9223372036854775807)}, want: 9223372036854775807},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
