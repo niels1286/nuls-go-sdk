@@ -70,6 +70,33 @@ func TestAccount(t *testing.T) {
 	})
 }
 
+func TestGetRealAddress(t *testing.T) {
+	cases := []string{
+		"NULSd6HgW1XmWzGsAtPaFbFKrfmV7gXmbLc55",
+		"NULSd6HgYs5xFJnfwDyfbjiMBbWsJEswJsj55",
+		"NULSd6HghYNHMHLGcXb4MucuUGmAxiomCnE55",
+		"SHITd6HgdJ4MNKrSJmtT8XoWMLnUw7g6TFB55",
+		"NULSd6HggTFtM7ZMy1D1YBqmbgNeDB8RCit55",
+		"tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
+		"tNULSeBaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD",
+	}
+	values := []string{
+		"6HgW1XmWzGsAtPaFbFKrfmV7gXmbLc55",
+		"6HgYs5xFJnfwDyfbjiMBbWsJEswJsj55",
+		"6HghYNHMHLGcXb4MucuUGmAxiomCnE55",
+		"6HgdJ4MNKrSJmtT8XoWMLnUw7g6TFB55",
+		"6HggTFtM7ZMy1D1YBqmbgNeDB8RCit55",
+		"BaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
+		"BaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD",
+	}
+	for index, address := range cases {
+		got := getRealAddress(address)
+		if got != values[index] {
+			t.Fatalf("获取真实地址错误")
+		}
+	}
+}
+
 func BenchmarkNewNormalAccount(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		NewNormalAccount(1, "NULS")

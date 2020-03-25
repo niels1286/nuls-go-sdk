@@ -20,10 +20,12 @@
 package account
 
 import (
+	"fmt"
 	"github.com/niels1286/nerve-go-sdk/crypto/base58"
 	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
 	cryptoutils "github.com/niels1286/nerve-go-sdk/crypto/utils"
 	"github.com/niels1286/nerve-go-sdk/math"
+	"strings"
 )
 
 const (
@@ -52,8 +54,8 @@ type Account struct {
 	accType uint8
 	//账户对应的公私钥对
 	eckey eckey.EcKey
-	//加密后的私钥，用于存储
-	cryptedPrkKey string
+	//地址前缀
+	prefix string
 }
 
 //创建一个新账户
@@ -67,8 +69,29 @@ func NewNormalAccount(chainId uint16, prefix string) (Account, error) {
 	pubBytes := ec.GetPubKeyBytes(true)
 	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
 	address := GetStringAddress(addressBytes, prefix)
-	return Account{address: address, chainId: chainId, accType: NormalAccountType, eckey: ec, cryptedPrkKey: ""}, nil
+	return Account{
+		address: address,
+		chainId: chainId,
+		accType: NormalAccountType,
+		eckey:   ec,
+		prefix:  prefix,
+	}, nil
+}
 
+//去除前缀，获得真正的地址字符串
+func getRealAddress(address string) string {
+	if strings.HasPrefix(address, "NULS") {
+		return address[5:]
+	}
+	if strings.HasPrefix(address, "tNULS") {
+		return address[6:]
+	}
+	for index, c := range address {
+		if c >= 97 {
+			return address[index+1:]
+		}
+	}
+	return ""
 }
 
 //根据地址字节数组，生成可以阅读的字符串地址
@@ -108,6 +131,11 @@ func ParseAccount(address string) Account {
 }
 
 func Valid(address string) bool {
+	if address == "" {
+		return false
+	}
+	realAddressStr := getRealAddress(address)
+	fmt.Println(realAddressStr)
 	//todo
 	return false
 }
