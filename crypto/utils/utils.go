@@ -22,6 +22,7 @@ package cryptoutils
 
 import (
 	"crypto/sha256"
+	aesutils "github.com/niels1286/nuls-go-sdk/crypto/aes"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -48,4 +49,14 @@ func Ripemd160h(data []byte) []byte {
 	h := ripemd160.New()
 	h.Write(data)
 	return h.Sum(nil)
+}
+
+//Use aes algorithm to encrypt data
+func AESEncrpt(data, key []byte) []byte {
+	return aesutils.Encrypt(data, key)
+}
+
+//Use aes algorithm to decrypt data
+func AESDecrpt(data, key []byte) []byte {
+	return aesutils.Decrypt(data, key)
 }
