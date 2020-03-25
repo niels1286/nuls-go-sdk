@@ -91,6 +91,17 @@ func TestAccount(t *testing.T) {
 			}
 		}
 	})
+	t.Run("test import account", func(t *testing.T) {
+		prikey := "16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805"
+		account, err := GetAccountFromPrkey(prikey, NULSChainId, NULSPrefix)
+		if err != nil {
+			t.Fatalf(err.Error())
+		}
+		if account.Address != "NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE" {
+			t.Fatalf("import account failed.")
+		}
+
+	})
 }
 
 func TestGetRealAddress(t *testing.T) {
@@ -120,7 +131,7 @@ func TestGetRealAddress(t *testing.T) {
 			t.Fatalf("Get real address string failed.")
 		}
 	}
-	ExampleNewTNULSAccount()
+
 }
 
 func BenchmarkNewNormalAccount(b *testing.B) {
@@ -175,4 +186,21 @@ func ExampleNewTNULSAccount() {
 	//tNULSeBaMfPtJojgo4326pkGDoL3urfDeUr7LY==a34fddfc29fd8f9ed926a7bfd3fc6d95f3ada562428037d2d025757656f2679d
 	//tNULSeBaMhtBv61fnznegqTmMvYgcs9Yqnzk7g==9db69ef368b3e3176918de21ba5f1927e9beb61d0b02cd74fc796279aa85233c
 	//tNULSeBaMgzeDmZQetKWfVb5AjsTg8SuzfRLiS==7127ff18134ee74f248850ae496f3617b1ef69bdc59e818539e5aaeea43c7969
+}
+
+//根据私钥创建账户的示例
+func ExampleGetAccountFromPrkey() {
+	//私钥
+	prikey := "16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805"
+	//调用方法，生成NULS主网地址
+	account, err := GetAccountFromPrkey(prikey, NULSChainId, NULSPrefix)
+	if err != nil {
+		log.Fatalf(err.Error())
+		return
+	}
+	//跟预先生成的地址做对比
+	if account.Address != "NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE" {
+		log.Fatalf("import account failed.")
+	}
+	fmt.Println(account)
 }

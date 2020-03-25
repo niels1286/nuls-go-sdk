@@ -20,6 +20,7 @@
 package account
 
 import (
+	"encoding/hex"
 	"errors"
 	"github.com/niels1286/nuls-go-sdk/crypto/base58"
 	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
@@ -77,6 +78,11 @@ func NewNormalAccount(chainId uint16, prefix string) (Account, error) {
 	if err != nil {
 		return Account{}, err
 	}
+	return getAccountByEckey(ec, chainId, prefix)
+}
+
+//根据EcKey生成账户
+func getAccountByEckey(ec eckey.EcKey, chainId uint16, prefix string) (Account, error) {
 	pubBytes := ec.GetPubKeyBytes(true)
 	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
 	address := GetStringAddress(addressBytes, prefix)
@@ -216,4 +222,17 @@ func Valid(address string) bool {
 		return false
 	}
 	return true
+}
+
+//根据私钥生成账户
+func GetAccountFromPrkey(priHex string, chainId uint16, prefix string) (Account, error) {
+	prikeyBytes, err := hex.DecodeString(priHex)
+	if err != nil {
+		return Account{}, err
+	}
+	ec, err := eckey.FromPriKeyBytes(prikeyBytes)
+	if err != nil {
+		return Account{}, err
+	}
+	return getAccountByEckey(ec, chainId, prefix)
 }
