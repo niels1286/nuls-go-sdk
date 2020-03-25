@@ -22,7 +22,7 @@ package eckey
 
 import (
 	"encoding/hex"
-	"nuls-go-sdk/assert"
+	"github.com/niels1286/nuls-go-sdk/assert"
 	"testing"
 )
 
@@ -222,6 +222,15 @@ func TestNewEcKey(t *testing.T) {
 			t.Fatalf("Verify signature failed.")
 		}
 	})
+}
+
+func TestCipher(t *testing.T) {
+	eckey, _ := NewEcKey()
+	dataHex := "230cb8ebbf3a2c581d27f98f7a38f8b07c1ff170d605ca645db4ffa05ffa5505"
+	data, _ := hex.DecodeString(dataHex)
+	result := eckey.Encrypt(data)
+	_data := eckey.Decrypt(result)
+	assert.IsDeepEquals(t, data, _data)
 }
 
 type eckeyCase struct {

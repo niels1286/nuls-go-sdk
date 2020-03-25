@@ -1,6 +1,9 @@
 package assert
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 //传入的数据必须是nil，否则失败
 func IsNil(t *testing.T, val interface{}, title string) {
@@ -27,5 +30,7 @@ func IsEquals(t *testing.T, got, want interface{}) {
 
 func IsDeepEquals(t *testing.T, got, want interface{}) {
 	t.Helper()
-	t.Fatalf("stop todo ...")
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got and want not equals.")
+	}
 }

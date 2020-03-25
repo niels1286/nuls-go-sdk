@@ -76,8 +76,8 @@ func TestAccount(t *testing.T) {
 			"NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55",
 			"tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
 		}
-		values := []Account{{Address: "NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55", ChainId: NULSChainId, AccType: NormalAccountType, Eckey: eckey.EcKey{}, Prefix: NULSPrefix},
-			{Address: "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG", ChainId: TNULSChainId, AccType: NormalAccountType, Eckey: eckey.EcKey{}, Prefix: TNULSPrefix}}
+		values := []Account{{Address: "NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55", ChainId: NULSChainId, AccType: NormalAccountType, EcKey: eckey.EcKey{}, Prefix: NULSPrefix},
+			{Address: "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG", ChainId: TNULSChainId, AccType: NormalAccountType, EcKey: eckey.EcKey{}, Prefix: TNULSPrefix}}
 		for index, address := range cases {
 			account, err := ParseAccount(address)
 			if err != nil {
@@ -150,7 +150,7 @@ func ExampleNewNULSAccount() {
 	}
 	for _, account := range accounts {
 		//打印账户地址和对应的私钥
-		fmt.Println(account.Address + "==" + account.Eckey.GetPriKeyHex())
+		fmt.Println(account.Address + "==" + account.GetPriKeyHex())
 	}
 	//NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE==16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805
 	//NULSd6HghwPEJHBhTqToddfJhKwLZfKpsw1ZL==fb5aec7082b676f855f7f352e2e3dcbc3d6a3d58f35e22a09d5e9c86666bc53a
@@ -174,7 +174,7 @@ func ExampleNewTNULSAccount() {
 	}
 	for _, account := range accounts {
 		//打印账户地址和对应的私钥
-		fmt.Println(account.Address + "==" + account.Eckey.GetPriKeyHex())
+		fmt.Println(account.Address + "==" + account.GetPriKeyHex())
 	}
 	//tNULSeBaMtnMutUtYdG7aY8ez1repGkSP6aGxU==f238c843ec712e9b855284522607ee100dfce6172e5cc6440a55504d373e5020
 	//tNULSeBaMvT85ZfUStMUR3czgyqH3xX7sTYDmh==52cddc098953a9219de357c44effee2573e2f47f85d883a758b2908a1ae9ffb0

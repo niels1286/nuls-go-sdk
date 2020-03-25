@@ -104,3 +104,25 @@ func (e EcKey) Verify(data, signature []byte) bool {
 	}
 	return sig.Verify(data, e.publicKey)
 }
+
+//使用公钥加密数据
+func (e EcKey) Encrypt(data []byte) []byte {
+	val, err := btcec.Encrypt(e.publicKey, data)
+	if err != nil {
+		log.Fatalf(err.Error())
+		return nil
+	}
+	return val
+}
+
+//使用私钥解密以公钥加密的数据
+func (e EcKey) Decrypt(in []byte) []byte {
+	val, err := btcec.Decrypt(e.privateKey, in)
+	if err != nil {
+		log.Fatalf(err.Error())
+		return nil
+	}
+	return val
+}
+
+//使用私钥解密由公钥加密的数据
