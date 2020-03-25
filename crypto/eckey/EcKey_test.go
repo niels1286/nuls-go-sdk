@@ -22,7 +22,7 @@ package eckey
 
 import (
 	"encoding/hex"
-	"github.com/niels1286/nuls-go-sdk/assert"
+	"github.com/niels1286/nuls-go-sdk/utils/assert"
 	"testing"
 )
 

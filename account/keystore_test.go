@@ -20,15 +20,40 @@
 package account
 
 import (
-	"github.com/niels1286/nuls-go-sdk/assert"
+	"github.com/niels1286/nuls-go-sdk/utils/assert"
 	"io/ioutil"
 	"os"
 	"testing"
 )
 
-func TestKeystore(t *testing.T) {
-	t.Run("test create keystore ", func(t *testing.T) {
+type PasswordCheckCase struct {
+	password string
+	result   bool
+}
 
+func TestKeystore(t *testing.T) {
+	t.Run("test password format check", func(t *testing.T) {
+		cases := []PasswordCheckCase{
+			PasswordCheckCase{"123123", false},
+			PasswordCheckCase{"Nuls1234", true},
+			PasswordCheckCase{"asdfasdf", false},
+			PasswordCheckCase{"sadfWSAFSDF", false},
+			PasswordCheckCase{"QWER123434567asdfasdfasdfsadf", false},
+			PasswordCheckCase{"Nuls123#@!", true},
+			PasswordCheckCase{"!@#$%^&*()", false},
+			PasswordCheckCase{"123456qwe", true},
+		}
+		for _, item := range cases {
+			result := PasswordCheck(item.password)
+			assert.IsEquals(t, result, item.result)
+		}
+	})
+	t.Run("test create keystore ", func(t *testing.T) {
+		account, _ := NewNormalAccount(NULSChainId, NULSPrefix)
+		keystore, _ := CreateKeyStore(account, "Nuls1234")
+		//bytes, _ := json.Marshal(keystore)
+		//fmt.Println(fmt.Println(string(bytes)))
+		assert.NotNil(t, keystore.EncryptedPrivateKey, "encryptedPrikey")
 	})
 	t.Run("test import keystore ", func(t *testing.T) {
 		file, removeFile := createTempFile(t, `{
@@ -36,11 +61,16 @@ func TestKeystore(t *testing.T) {
 		"encryptedPrivateKey":"9308015df78d2ee856710c459dc8166589172fdda356ce96277ba5ccbcbeca369cb8085c5326d500453a643d55e5269e",
 		"pubKey":"0233dd5281a4e129dafeea8637b54806f667e56f654e098c5faab87fa7fe889d11"}`)
 		defer removeFile()
+		file.Seek(0, 0)
 		keystore, err := KeystoreFromFile(file)
 		assert.IsNil(t, err, "keystore err")
 		assert.IsEquals(t, keystore.Address, "tNULSeBaMtDQocJJiBGEDwFpPQPKXJo6pXmW7b")
 		assert.IsEquals(t, keystore.EncryptedPrivateKey, "9308015df78d2ee856710c459dc8166589172fdda356ce96277ba5ccbcbeca369cb8085c5326d500453a643d55e5269e")
 		assert.IsEquals(t, keystore.Pubkey, "0233dd5281a4e129dafeea8637b54806f667e56f654e098c5faab87fa7fe889d11")
+		//epk, _ := hex.DecodeString(keystore.EncryptedPrivateKey)
+		//key := cryptoutils.Sha256h([]byte("qwer1234"))
+		//prikey := cryptoutils.AESDecrypt(epk, key)
+		//fmt.Println(hex.EncodeToString(prikey))
 	})
 }
 

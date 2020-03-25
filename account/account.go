@@ -25,7 +25,7 @@ import (
 	"github.com/niels1286/nuls-go-sdk/crypto/base58"
 	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
 	cryptoutils "github.com/niels1286/nuls-go-sdk/crypto/utils"
-	"github.com/niels1286/nuls-go-sdk/math"
+	"github.com/niels1286/nuls-go-sdk/utils/math"
 	"log"
 	"strings"
 )

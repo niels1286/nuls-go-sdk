@@ -52,11 +52,11 @@ func Ripemd160h(data []byte) []byte {
 }
 
 //Use aes algorithm to encrypt data
-func AESEncrpt(data, key []byte) []byte {
+func AESEncrypt(data, key []byte) []byte {
 	return aesutils.Encrypt(data, key)
 }
 
 //Use aes algorithm to decrypt data
-func AESDecrpt(data, key []byte) []byte {
+func AESDecrypt(data, key []byte) []byte {
 	return aesutils.Decrypt(data, key)
 }
