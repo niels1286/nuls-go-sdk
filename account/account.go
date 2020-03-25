@@ -25,7 +25,7 @@ import (
 	"github.com/niels1286/nuls-go-sdk/crypto/base58"
 	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
 	cryptoutils "github.com/niels1286/nuls-go-sdk/crypto/utils"
-	"github.com/niels1286/nuls-go-sdk/utils/math"
+	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
 	"log"
 	"strings"
 )
@@ -124,7 +124,7 @@ func GetStringAddress(bytes []byte, prefix string) string {
 func GetAddressByPubBytes(bytes []byte, chainId uint16, accountType uint8, prefix string) []byte {
 	hash160 := cryptoutils.Hash160(bytes)
 	addressBytes := []byte{}
-	addressBytes = append(addressBytes, math.Uint16ToBytes(chainId)...)
+	addressBytes = append(addressBytes, mathutils.Uint16ToBytes(chainId)...)
 	addressBytes = append(addressBytes, accountType)
 	addressBytes = append(addressBytes, hash160...)
 	return addressBytes
@@ -179,7 +179,7 @@ func ParseAccount(address string) (Account, error) {
 	}
 	prefix, realAddressStr := getRealAddress(address)
 	bytes := base58.Decode(realAddressStr)
-	chainId := math.BytesToUint16(bytes[0:1])
+	chainId := mathutils.BytesToUint16(bytes[0:1])
 	accountType := bytes[2]
 	addressBytes := bytes[0 : len(bytes)-1]
 	return Account{
@@ -203,7 +203,7 @@ func Valid(address string) bool {
 	if len(bytes) != AddressBytesLength+1 {
 		return false
 	}
-	chainId := math.BytesToUint16(bytes[0:1])
+	chainId := mathutils.BytesToUint16(bytes[0:1])
 	//验证已知链的前缀是否正确
 	if chainId == NULSChainId && prefix != NULSPrefix {
 		return false

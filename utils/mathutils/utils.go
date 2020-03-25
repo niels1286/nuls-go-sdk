@@ -18,21 +18,20 @@
  * SOFTWARE.
  */
 
-package math
+package mathutils
+
+import (
+	"encoding/binary"
+	"errors"
+	"math"
+	"math/big"
+)
 
 func Uint16ToBytes(n uint16) []byte {
 	return []byte{
 		byte(n),
 		byte(n >> 8),
 	}
-}
-
-func BytesToUint16(array []byte) uint16 {
-	var data uint16 = 0
-	for i := 0; i < len(array); i++ {
-		data = data + uint16(uint(array[i])<<uint(8*i))
-	}
-	return data
 }
 
 func Uint32ToBytes(n uint32) []byte {
@@ -55,4 +54,55 @@ func Uint64ToBytes(n uint64) []byte {
 		byte(n >> 48),
 		byte(n >> 56),
 	}
+}
+
+func StringToBigInt(val string) (*big.Int, error) {
+	n := new(big.Int)
+	n, ok := n.SetString(val, 10)
+	if !ok {
+		return big.NewInt(0), errors.New("String to big int failed.")
+	}
+	return n, nil
+}
+
+func BytesToBigInt(bytes []byte) *big.Int {
+	i := new(big.Int)
+	i.SetBytes(bytes)
+	return i
+}
+
+func BytesToUint32(bytes []byte) uint32 {
+	return binary.LittleEndian.Uint32(bytes)
+}
+
+func BytesToUint16(bytes []byte) uint16 {
+	return binary.LittleEndian.Uint16(bytes)
+}
+
+func BytesToUint64(bytes []byte) uint64 {
+	return binary.LittleEndian.Uint64(bytes)
+}
+
+func BytesToFloat64(bytes []byte) float64 {
+	bits := binary.LittleEndian.Uint64(bytes)
+	return math.Float64frombits(bits)
+}
+
+//Float64ToByte Float64转byte
+func Float64ToBytes(float float64) []byte {
+	bits := math.Float64bits(float)
+	bytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bytes, bits)
+	return bytes
+}
+
+func VarIntToBytes(varint int64) []byte {
+	bytes := []byte{}
+	binary.PutVarint(bytes, varint)
+	return bytes
+}
+
+func BytesToVarInt(bytes []byte) int64 {
+	val, _ := binary.Varint(bytes)
+	return val
 }

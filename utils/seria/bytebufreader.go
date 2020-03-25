@@ -25,11 +25,13 @@
 package seria
 
 import (
-	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
+	"errors"
+	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
 	"math/big"
 )
 
 //反序列化工具，可以从byte slice中读取各种数据类型的数据
+//这个对象是线程不安全的，使用时需要避免并发调用
 type ByteBufReader struct {
 	//完整的字节slice
 	payload []byte
@@ -42,56 +44,111 @@ func NewByteBufReader(payload []byte, cursor int) ByteBufReader {
 	return ByteBufReader{payload, cursor}
 }
 
-//从字节序列中读取一个uint16
-func (reader *ByteBufReader) ReadUint16() uint16 {
+//判断当前状态下，是否还可以继续读取length个字节的数据
+func (reader ByteBufReader) canRead(length int) bool {
+	if length == 0 {
+		return false
+	}
+	return length+reader.cursor >= len(reader.payload)
+}
 
+//从当前的字节序列中读取一个字节，并在游标加1
+func (reader *ByteBufReader) ReadByte() (byte, error) {
+	if !reader.canRead(1) {
+		return 0, errors.New("Thers is not enough bytes.")
+	}
+	reader.cursor++
+	return reader.payload[reader.cursor-1], nil
+}
+
+//从字节序列中读取指定数量的字节
+func (reader *ByteBufReader) ReadBytes(length int) ([]byte, error) {
+	if !reader.canRead(length) {
+		return []byte{}, nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return bytes, nil
+}
+
+//从字节序列中读取一个uint16,2个字节
+func (reader *ByteBufReader) ReadUint16() (uint16, error) {
+	length := 2
+	if !reader.canRead(length) {
+		return 0, nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return mathutils.BytesToUint16(bytes), nil
 }
 
 //从字节序列中读取一个uint32
-func (reader *ByteBufReader) ReadUint32() uint32 {
+func (reader *ByteBufReader) ReadUint32() (uint32, error) {
+	length := 4
+	if !reader.canRead(length) {
+		return 0, nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return mathutils.BytesToUint32(bytes), nil
+}
+func (reader *ByteBufReader) ReadVarInt() (int, error) {
 
 }
-func (reader *ByteBufReader) ReadVarInt() int {
-
-}
-func (reader *ByteBufReader) ReadUint64() uint64 {
-
-}
-func (reader *ByteBufReader) ReadByte() byte {
-
-}
-func (reader *ByteBufReader) ReadBytes(length int) []byte {
-
+func (reader *ByteBufReader) ReadUint64() (uint64, error) {
+	length := 8
+	if !reader.canRead(length) {
+		return 0, nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return mathutils.BytesToUint64(bytes), nil
 }
 
-func (reader *ByteBufReader) ReadBytesWithLen() []byte {
-
-}
-func (reader *ByteBufReader) ReadStringWithLen() []string {
-
-}
-func (reader *ByteBufReader) ReadBool() bool {
-
-}
-func (reader *ByteBufReader) ReadBigInt() big.Int {
-
+func (reader *ByteBufReader) ReadBytesWithLen() ([]byte, error) {
+	length, err := reader.ReadVarInt()
+	if err != nil {
+		return []byte{}, err
+	}
+	return reader.ReadBytes(length)
 }
 
-func (reader *ByteBufReader) ReadFloat32() float32 {
-
+func (reader *ByteBufReader) ReadStringWithLen() (string, error) {
+	bytes, err := reader.ReadBytesWithLen()
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
 
-func (reader *ByteBufReader) ReadFloat64() float64 {
-
+func (reader *ByteBufReader) ReadBool() (bool, error) {
+	val, err := reader.ReadByte()
+	if err != nil {
+		return false, err
+	}
+	return val == 1, nil
 }
 
-func (reader *ByteBufReader) ReadTx() txprotocal.Transaction {
-
+func (reader *ByteBufReader) ReadBigInt() (*big.Int, error) {
+	length := 32
+	if !reader.canRead(length) {
+		return big.NewInt(0), nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return mathutils.BytesToBigInt(bytes), nil
 }
 
-func (reader *ByteBufReader) ReadHash() []byte {
-
+func (reader *ByteBufReader) ReadFloat64() (float64, error) {
+	length := 8
+	if !reader.canRead(length) {
+		return 0, nil
+	}
+	bytes := reader.payload[reader.cursor : reader.cursor+length]
+	reader.cursor += length
+	return mathutils.BytesToFloat64(bytes), nil
 }
+
 func (reader ByteBufReader) GetPayload() []byte {
 	return reader.payload
 }
