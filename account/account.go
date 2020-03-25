@@ -25,6 +25,7 @@ import (
 	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
 	cryptoutils "github.com/niels1286/nerve-go-sdk/crypto/utils"
 	"github.com/niels1286/nerve-go-sdk/math"
+	"log"
 	"strings"
 )
 
@@ -133,13 +134,36 @@ func calcXor(bytes []byte) byte {
 }
 
 //创建一个NULS主网账户
-func NewNULSAccount() (Account, error) {
-	return NewNormalAccount(NULSChainId, NULSPrefix)
+func NewNULSAccount(count int) ([]Account, error) {
+	return BatchNewAccount(count, NULSChainId, NULSPrefix)
 }
 
 //创建一个NULS测试网账户
-func NewTNULSAccount() (Account, error) {
-	return NewNormalAccount(TNULSChainId, TNULSPrefix)
+func NewTNULSAccount(count int) ([]Account, error) {
+	return BatchNewAccount(count, TNULSChainId, TNULSPrefix)
+}
+
+//批量创建账户
+func BatchNewAccount(count int, chainId uint16, prefix string) ([]Account, error) {
+	result := []Account{}
+	resultChannel := make(chan Account)
+	for i := 0; i < count; i++ {
+		go func() {
+			account, err := NewNormalAccount(chainId, prefix)
+			if err != nil {
+				log.Fatal("Create account failed.")
+			}
+			resultChannel <- account
+		}()
+	}
+	for i := 0; i < count; i++ {
+		account := <-resultChannel
+		if account.Address == "" {
+			continue
+		}
+		result = append(result, account)
+	}
+	return result, nil
 }
 
 //根据地址还原账户基本信息
