@@ -24,6 +24,8 @@
 // @Author  Niels  2020/3/25
 package txprotocal
 
+import "github.com/niels1286/nuls-go-sdk/utils/seria"
+
 //基础交易结构，NULS生态中所有的交易都是已次结构组成的
 type Transaction struct {
 	//交易类型，@txtype.go中对网络支持的交易类型做了常量
@@ -38,4 +40,25 @@ type Transaction struct {
 	coinData []byte
 	//交易签名数据，支持多个签名，每个签名包含一个公钥和一个签名数据
 	sigData []byte
+}
+
+//将交易序列化为字节slice
+func (t Transaction) serialize() ([]byte, error) {
+
+}
+
+//将字节slice反序列化为交易结构体
+//@bytes 包含交易的完整的序列化数据的字节slice
+//@cursor 游标，从此开始解析交易
+func ParseTransaction(bytes []byte, cursor int) (Transaction, error) {
+	return ParseTransactionByReader(seria.NewByteBufReader(bytes, cursor))
+}
+
+//从Reader中解析交易
+//@reader 字节slice数据阅读器，其中包含交易的完整序列化数据，且cursor刚好处于交易数据的起始点
+func ParseTransactionByReader(reader seria.ByteBufReader) (Transaction, error) {
+	tx := Transaction{}
+	tx.txType = reader.ReadUint16()
+
+	return tx, nil
 }
