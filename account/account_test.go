@@ -204,3 +204,13 @@ func ExampleGetAccountFromPrkey() {
 	}
 	fmt.Println(account)
 }
+
+//地址验证是非常常用的功能，任何业务逻辑都应该先验证涉及的地址是否正确
+func ExampleValid() {
+	address := "tNULSeBaMgzeDmZQetKWfVb5AjsTg8SuzfRLiS"
+	result := Valid(address)
+
+	if !result {
+		log.Println("%s is not a right address", address)
+	}
+}

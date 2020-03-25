@@ -32,7 +32,6 @@ func BytesToUint16(array []byte) uint16 {
 	for i := 0; i < len(array); i++ {
 		data = data + uint16(uint(array[i])<<uint(8*i))
 	}
-
 	return data
 }
 
