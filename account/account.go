@@ -20,7 +20,7 @@
 package account
 
 import (
-	"fmt"
+	"errors"
 	"github.com/niels1286/nerve-go-sdk/crypto/base58"
 	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
 	cryptoutils "github.com/niels1286/nerve-go-sdk/crypto/utils"
@@ -29,6 +29,14 @@ import (
 )
 
 const (
+	//NULS主网ID
+	NULSChainId = uint16(1)
+	//NULS主网的默认前缀
+	NULSPrefix = "NULS"
+	//NULS测试网id
+	TNULSChainId = uint16(2)
+	//NULS测试网的地址前缀
+	TNULSPrefix = "tNULS"
 	//默认的地址字节长度
 	AddressBytesLength = 23
 	//默认账户类型
@@ -46,16 +54,18 @@ var PrefixTable = [...]string{"", "a", "b", "c", "d", "e"}
 type Account struct {
 	//地址，是用户操作的载体，账户余额管理、转账、数据权限等，全有地址来识别
 	//地址的格式为：address = prefix + Base58Encode(chainId+addressType+pkh+xor)
-	address string
+	Address string
+	//地址的字节数组，在链上存储是，使用该格式
+	AddressBytes []byte
 	//NULS是一个多链生态，每一条区块链，都有自己的id，用于在多链交互时，识别所属身份
 	//NULS主网为1，NULS测试网为2
-	chainId uint16
+	ChainId uint16
 	//账户类型：1、普通账户，2、合约地址，3、多签地址
-	accType uint8
+	AccType uint8
 	//账户对应的公私钥对
-	eckey eckey.EcKey
+	Eckey eckey.EcKey
 	//地址前缀
-	prefix string
+	Prefix string
 }
 
 //创建一个新账户
@@ -70,28 +80,29 @@ func NewNormalAccount(chainId uint16, prefix string) (Account, error) {
 	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
 	address := GetStringAddress(addressBytes, prefix)
 	return Account{
-		address: address,
-		chainId: chainId,
-		accType: NormalAccountType,
-		eckey:   ec,
-		prefix:  prefix,
+		Address:      address,
+		AddressBytes: addressBytes,
+		ChainId:      chainId,
+		AccType:      NormalAccountType,
+		Eckey:        ec,
+		Prefix:       prefix,
 	}, nil
 }
 
 //去除前缀，获得真正的地址字符串
-func getRealAddress(address string) string {
-	if strings.HasPrefix(address, "NULS") {
-		return address[5:]
+func getRealAddress(address string) (prefix, realAddress string) {
+	if strings.HasPrefix(address, NULSPrefix) {
+		return NULSPrefix, address[5:]
 	}
-	if strings.HasPrefix(address, "tNULS") {
-		return address[6:]
+	if strings.HasPrefix(address, TNULSPrefix) {
+		return TNULSPrefix, address[6:]
 	}
 	for index, c := range address {
 		if c >= 97 {
-			return address[index+1:]
+			return address[0 : index-1], address[index+1:]
 		}
 	}
-	return ""
+	return "", ""
 }
 
 //根据地址字节数组，生成可以阅读的字符串地址
@@ -121,21 +132,64 @@ func calcXor(bytes []byte) byte {
 	return xor
 }
 
+//创建一个NULS主网账户
 func NewNULSAccount() (Account, error) {
-	return NewNormalAccount(1, "NULS")
+	return NewNormalAccount(NULSChainId, NULSPrefix)
 }
 
-func ParseAccount(address string) Account {
-	//todo
-	return Account{}
+//创建一个NULS测试网账户
+func NewTNULSAccount() (Account, error) {
+	return NewNormalAccount(TNULSChainId, TNULSPrefix)
 }
 
+//根据地址还原账户基本信息
+func ParseAccount(address string) (Account, error) {
+	if address == "" {
+		return Account{}, errors.New("The address is blank.")
+	}
+	prefix, realAddressStr := getRealAddress(address)
+	bytes := base58.Decode(realAddressStr)
+	chainId := math.BytesToUint16(bytes[0:1])
+	accountType := bytes[2]
+	addressBytes := bytes[0 : len(bytes)-1]
+	return Account{
+		Address:      address,
+		AddressBytes: addressBytes,
+		ChainId:      chainId,
+		AccType:      accountType,
+		Eckey:        eckey.EcKey{},
+		Prefix:       prefix,
+	}, nil
+}
+
+//验证地址是否正确
 func Valid(address string) bool {
 	if address == "" {
 		return false
 	}
-	realAddressStr := getRealAddress(address)
-	fmt.Println(realAddressStr)
-	//todo
-	return false
+	prefix, realAddressStr := getRealAddress(address)
+	bytes := base58.Decode(realAddressStr)
+	//长度必须正确，默认长度+一个校验位（xor）
+	if len(bytes) != AddressBytesLength+1 {
+		return false
+	}
+	chainId := math.BytesToUint16(bytes[0:1])
+	//验证已知链的前缀是否正确
+	if chainId == NULSChainId && prefix != NULSPrefix {
+		return false
+	}
+	if chainId == TNULSChainId && prefix != TNULSPrefix {
+		return false
+	}
+	accountType := bytes[2]
+	if accountType > P2SHAccountType {
+		return false
+	}
+	addressBytes := bytes[0 : len(bytes)-1]
+	xor := calcXor(addressBytes)
+	if xor != bytes[len(bytes)-1] {
+		//校验位不正确
+		return false
+	}
+	return true
 }

@@ -21,6 +21,7 @@
 package account
 
 import (
+	"github.com/niels1286/nerve-go-sdk/crypto/eckey"
 	"testing"
 )
 
@@ -31,8 +32,8 @@ func TestAccount(t *testing.T) {
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
-		//fmt.Println(account.address+"::::::::"+account.eckey.GetPriKeyHex())
-		if account.address == "" {
+
+		if account.Address == "" {
 			t.Fatalf("create account failed")
 		}
 	})
@@ -60,13 +61,33 @@ func TestAccount(t *testing.T) {
 		}
 	})
 	t.Run("Test create and valid", func(t *testing.T) {
-		//account, _ := NewAccount()
-		//
-		//success := Valid(account.Address)
-		//
-		//if !success {
-		//	t.Errorf("create account and valid failed.")
-		//}
+		account, _ := NewNormalAccount(NULSChainId, NULSPrefix)
+
+		success := Valid(account.Address)
+
+		if !success {
+			t.Errorf("create account and valid failed.")
+		}
+	})
+	t.Run("test parse address", func(t *testing.T) {
+		cases := []string{
+			"NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55",
+			"tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
+		}
+		values := []Account{{Address: "NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55", ChainId: NULSChainId, AccType: NormalAccountType, Eckey: eckey.EcKey{}, Prefix: NULSPrefix},
+			{Address: "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG", ChainId: TNULSChainId, AccType: NormalAccountType, Eckey: eckey.EcKey{}, Prefix: TNULSPrefix}}
+		for index, address := range cases {
+			account, err := ParseAccount(address)
+			if err != nil {
+				t.Fatalf("Parse account failed 0.")
+			}
+			if account.ChainId != values[index].ChainId || account.AccType != values[index].AccType || account.Prefix != values[index].Prefix || account.Address != values[index].Address {
+				t.Fatalf("parse account failed")
+			}
+			if GetStringAddress(account.AddressBytes, account.Prefix) != account.Address {
+				t.Fatalf("parse account failed 2")
+			}
+		}
 	})
 }
 
@@ -80,6 +101,7 @@ func TestGetRealAddress(t *testing.T) {
 		"tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
 		"tNULSeBaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD",
 	}
+
 	values := []string{
 		"6HgW1XmWzGsAtPaFbFKrfmV7gXmbLc55",
 		"6HgYs5xFJnfwDyfbjiMBbWsJEswJsj55",
@@ -89,16 +111,17 @@ func TestGetRealAddress(t *testing.T) {
 		"BaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
 		"BaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD",
 	}
+
 	for index, address := range cases {
-		got := getRealAddress(address)
+		_, got := getRealAddress(address)
 		if got != values[index] {
-			t.Fatalf("获取真实地址错误")
+			t.Fatalf("Get real address string failed.")
 		}
 	}
 }
 
 func BenchmarkNewNormalAccount(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewNormalAccount(1, "NULS")
+		NewNormalAccount(1, NULSPrefix)
 	}
 }
