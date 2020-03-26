@@ -26,6 +26,7 @@ package mathutils
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
 	"reflect"
 	"testing"
@@ -87,7 +88,7 @@ func TestUint16ToBytes(t *testing.T) {
 	}{
 		{name: "TestUint16ToBytes.a", args: args{0}, want: []byte{0, 0}},
 		{name: "TestUint16ToBytes.b", args: args{65535}, want: []byte{255, 255}},
-		{name: "TestUint16ToBytes.c", args: args{11111}, want: []byte{}},
+		{name: "TestUint16ToBytes.c", args: args{11111}, want: []byte{103, 43}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -148,6 +149,7 @@ func TestBytesToBigInt(t *testing.T) {
 
 	bytes1, _ := hex.DecodeString("b1fa764412178e1eb2cb92616de84300a50b4790f84901000000000000000000")
 	want1, _ := StringToBigInt("123456789987654321123456789987654321123456789987654321")
+	fmt.Println(hex.EncodeToString(want1.Bytes()))
 	tests := []struct {
 		name string
 		args args
@@ -253,14 +255,14 @@ func TestFloat64ToBytes(t *testing.T) {
 
 func TestVarIntToBytes(t *testing.T) {
 	type args struct {
-		varint int64
+		varint uint64
 	}
 	tests := []struct {
 		name string
 		args args
 		want []byte
 	}{
-		{name: "varinttobytes.a", args: args{varint: 0}, want: []byte{0}},
+		{name: "varinttobytes.a", args: args{varint: 100}, want: []byte{100}},
 		{name: "varinttobytes.b", args: args{varint: 65536}, want: []byte{254, 0, 0, 1, 0}},
 		{name: "varinttobytes.c", args: args{varint: 2147483647}, want: []byte{254, 255, 255, 255, 127}},
 		{name: "varinttobytes.d", args: args{varint: 9223372036854775807}, want: []byte{255, 255, 255, 255, 255, 255, 255, 255, 127}},
@@ -281,11 +283,11 @@ func TestBytesToVarInt(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want int64
+		want uint64
 	}{
 		{name: "bytesToVarInt.a", args: args{bytes: VarIntToBytes(0)}, want: 0},
 		{name: "bytesToVarInt.b", args: args{bytes: VarIntToBytes(1)}, want: 1},
-		{name: "bytesToVarInt.c", args: args{bytes: VarIntToBytes(65536)}, want: 65535},
+		{name: "bytesToVarInt.c", args: args{bytes: VarIntToBytes(65536)}, want: 65536},
 		{name: "bytesToVarInt.d", args: args{bytes: VarIntToBytes(2147483647)}, want: 2147483647},
 		{name: "bytesToVarInt.e", args: args{bytes: VarIntToBytes(9223372036854775807)}, want: 9223372036854775807},
 	}
@@ -293,6 +295,54 @@ func TestBytesToVarInt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := BytesToVarInt(tt.args.bytes); got != tt.want {
 				t.Errorf("BytesToVarInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBigIntToBytes(t *testing.T) {
+	type args struct {
+		val *big.Int
+	}
+	val, _ := StringToBigInt("123456789987654321123456789987654321123456789987654321")
+	want, _ := hex.DecodeString("b1fa764412178e1eb2cb92616de84300a50b4790f84901000000000000000000")
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{name: "BigIntToBytes.a", args: args{val: val}, want: want, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := BigIntToBytes(tt.args.val)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BigIntToBytes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BigIntToBytes() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_aliceReverse(t *testing.T) {
+	type args struct {
+		bytes []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want []byte
+	}{
+		{name: "aliceREverse.a", args: args{bytes: []byte{1, 2, 3, 4, 5}}, want: []byte{5, 4, 3, 2, 1}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := aliceReverse(tt.args.bytes); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("aliceReverse() = %v, want %v", got, tt.want)
 			}
 		})
 	}

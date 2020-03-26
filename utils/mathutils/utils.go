@@ -67,8 +67,34 @@ func StringToBigInt(val string) (*big.Int, error) {
 
 func BytesToBigInt(bytes []byte) *big.Int {
 	i := new(big.Int)
-	i.SetBytes(bytes)
+	i.SetBytes(aliceReverse(bytes))
 	return i
+}
+
+const BigIntBytesLength = 32
+
+func BigIntToBytes(val *big.Int) ([]byte, error) {
+	bytes := val.Bytes()
+	bytes = aliceReverse(bytes)
+	length := len(bytes)
+	if length > BigIntBytesLength {
+		return []byte{}, errors.New("It's too long(big.int bytes)")
+	} else if length == BigIntBytesLength {
+		return bytes, nil
+	}
+	for i := BigIntBytesLength - length; i > 0; i-- {
+		bytes = append(bytes, 0)
+	}
+	return bytes, nil
+}
+
+//反转slice中的元素顺序
+func aliceReverse(bytes []byte) []byte {
+	newBytes := []byte{}
+	for i := len(bytes) - 1; i >= 0; i-- {
+		newBytes = append(newBytes, bytes[i])
+	}
+	return newBytes
 }
 
 func BytesToUint32(bytes []byte) uint32 {
@@ -96,13 +122,46 @@ func Float64ToBytes(float float64) []byte {
 	return bytes
 }
 
-func VarIntToBytes(varint int64) []byte {
+func VarIntToBytes(value uint64) []byte {
+	//bytes := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0,0}
+	//count := binary.PutUvarint(bytes, varint)
+	//return bytes[0:count]
 	bytes := []byte{}
-	binary.PutVarint(bytes, varint)
+	if value < 253 {
+		bytes = append(bytes, uint8(value))
+		return bytes
+	}
+	if value <= 0xFFFF {
+		// 1 marker + 2 entity bytes
+		bytes = append(bytes, 253)
+		bytes = append(bytes, Uint16ToBytes(uint16(value))...)
+		return bytes
+	}
+	if value <= 0xFFFFFFFF {
+		// 1 marker + 4 entity bytes
+		bytes = append(bytes, 254)
+		bytes = append(bytes, Uint32ToBytes(uint32(value))...)
+		return bytes
+	}
+	// 1 marker + 8 entity bytes
+	bytes = append(bytes, 255)
+	bytes = append(bytes, Uint64ToBytes(uint64(value))...)
 	return bytes
 }
 
-func BytesToVarInt(bytes []byte) int64 {
-	val, _ := binary.Varint(bytes)
-	return val
+func BytesToVarInt(bytes []byte) uint64 {
+	//val, _ := binary.Uvarint(bytes)
+	//return val
+	var value uint64
+	first := bytes[0]
+	if first < 253 {
+		value = uint64(first)
+	} else if first == 253 {
+		value = uint64(BytesToUint16(bytes[1:3]))
+	} else if first == 254 {
+		value = uint64(BytesToUint32(bytes[1:5]))
+	} else {
+		value = uint64(BytesToUint64(bytes[1:9]))
+	}
+	return value
 }
