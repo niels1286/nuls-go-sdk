@@ -45,7 +45,7 @@ func NewByteBufReader(payload []byte, cursor int) ByteBufReader {
 }
 
 //判断当前状态下，是否还可以继续读取length个字节的数据
-func (reader ByteBufReader) canRead(length int) bool {
+func (reader *ByteBufReader) canRead(length int) bool {
 	if length == 0 {
 		return false
 	}
@@ -155,9 +155,9 @@ func (reader *ByteBufReader) ReadFloat64() (float64, error) {
 	return mathutils.BytesToFloat64(bytes), nil
 }
 
-func (reader ByteBufReader) GetPayload() []byte {
+func (reader *ByteBufReader) GetPayload() []byte {
 	return reader.payload
 }
-func (reader ByteBufReader) GetCursor() int {
+func (reader *ByteBufReader) GetCursor() int {
 	return reader.cursor
 }
