@@ -42,7 +42,7 @@ func TestByteBufReader_GetCursor(t *testing.T) {
 		fields fields
 		want   int
 	}{
-		{name: "just test", fields: fields{[]byte{0}, 0}, want: 1},
+		{name: "just test", fields: fields{[]byte{0}, 0}, want: 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -127,8 +127,8 @@ func TestByteBufReader_ReadBool(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		{name: "TestReadBool.a", fields: fields{[]byte{1}, 0}, want: true, wantErr: nil},
-		{name: "TestReadBool.b", fields: fields{[]byte{0}, 0}, want: false, wantErr: nil},
+		{name: "TestReadBool.a", fields: fields{[]byte{1}, 0}, want: true, wantErr: false},
+		{name: "TestReadBool.b", fields: fields{[]byte{0}, 0}, want: false, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -159,8 +159,8 @@ func TestByteBufReader_ReadByte(t *testing.T) {
 		want    byte
 		wantErr bool
 	}{
-		{name: "readByte.a", fields: fields{[]byte{1}, 0}, want: 1, wantErr: nil},
-		{name: "readByte.b", fields: fields{[]byte{127}, 0}, want: 127, wantErr: nil},
+		{name: "readByte.a", fields: fields{[]byte{1}, 0}, want: 1, wantErr: false},
+		{name: "readByte.b", fields: fields{[]byte{127}, 0}, want: 127, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -195,8 +195,8 @@ func TestByteBufReader_ReadBytes(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{name: "raedBytes.a", fields: fields{[]byte{1, 2, 3, 4, 5, 6}, 2}, args: args{2}, want: []byte{3, 4}, wantErr: nil},
-		{name: "raedBytes.b", fields: fields{[]byte{1, 2, 3, 4, 5, 6}, 0}, args: args{4}, want: []byte{1, 2, 3, 4}, wantErr: nil},
+		{name: "raedBytes.a", fields: fields{[]byte{1, 2, 3, 4, 5, 6}, 2}, args: args{2}, want: []byte{3, 4}, wantErr: false},
+		{name: "raedBytes.b", fields: fields{[]byte{1, 2, 3, 4, 5, 6}, 0}, args: args{4}, want: []byte{1, 2, 3, 4}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -227,8 +227,8 @@ func TestByteBufReader_ReadBytesWithLen(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{name: "readbyteswithlen.a", fields: fields{[]byte{1, 5}, 0}, want: []byte{5}, wantErr: nil},
-		{name: "readbyteswithlen.b", fields: fields{[]byte{3, 5, 6, 7}, 0}, want: []byte{5, 6, 7}, wantErr: nil},
+		{name: "readbyteswithlen.a", fields: fields{[]byte{1, 5}, 0}, want: []byte{5}, wantErr: false},
+		{name: "readbyteswithlen.b", fields: fields{[]byte{3, 5, 6, 7}, 0}, want: []byte{5, 6, 7}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -259,8 +259,8 @@ func TestByteBufReader_ReadFloat64(t *testing.T) {
 		want    float64
 		wantErr bool
 	}{
-		{name: "readFloat64.a", fields: fields{[]byte{6, -127, -107, 67, -117, -44, 94, 64}, 0}, wantErr: nil, want: 123.321},
-		{name: "readFloat64.b", fields: fields{[]byte{29, 108, -79, -12, 16, 34, -79, 67}, 0}, wantErr: nil, want: 1234567890987654321.321},
+		{name: "readFloat64.a", fields: fields{[]byte{6, 129, 149, 67, 139, 212, 94, 64}, 0}, wantErr: false, want: 123.321},
+		{name: "readFloat64.b", fields: fields{[]byte{29, 108, 177, 244, 16, 34, 177, 67}, 0}, wantErr: false, want: 1234567890987654321.321},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -291,8 +291,8 @@ func TestByteBufReader_ReadStringWithLen(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{name: "readString.a", fields: fields{[]byte{12, 72, 101, 108, 108, 111, 44, 119, 111, 114, 108, 100, 33}, 0}, want: "Hello,world!", wantErr: nil},
-		{name: "readString.b", fields: fields{[]byte{29, 78, 117, 108, 115, 32, 105, 115, 32, 97, 32, 98, 108, 111, 99, 107, 99, 104, 97, 105, 110, 32, 112, 114, 111, 106, 101, 99, 116, 46}, 0}, want: "Nuls is a blockchain project.", wantErr: nil},
+		{name: "readString.a", fields: fields{[]byte{12, 72, 101, 108, 108, 111, 44, 119, 111, 114, 108, 100, 33}, 0}, want: "Hello,world!", wantErr: false},
+		{name: "readString.b", fields: fields{[]byte{29, 78, 117, 108, 115, 32, 105, 115, 32, 97, 32, 98, 108, 111, 99, 107, 99, 104, 97, 105, 110, 32, 112, 114, 111, 106, 101, 99, 116, 46}, 0}, want: "Nuls is a blockchain project.", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -323,8 +323,8 @@ func TestByteBufReader_ReadUint16(t *testing.T) {
 		want    uint16
 		wantErr bool
 	}{
-		{name: "readUint16.a", fields: fields{[]byte{0, 0}, 0}, want: 0, wantErr: nil},
-		{name: "readUint16.b", fields: fields{[]byte{-1, -1}, 0}, want: 65535, wantErr: nil},
+		{name: "readUint16.a", fields: fields{[]byte{0, 0}, 0}, want: 0, wantErr: false},
+		{name: "readUint16.b", fields: fields{[]byte{255, 255}, 0}, want: 65535, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -355,8 +355,8 @@ func TestByteBufReader_ReadUint32(t *testing.T) {
 		want    uint32
 		wantErr bool
 	}{
-		{name: "readUint32.a", fields: fields{[]byte{0, 0, 0, 0}, 0}, want: 0, wantErr: nil},
-		{name: "readUint32.b", fields: fields{[]byte{-1, -1, -1, -1}, 0}, want: 4294967295, wantErr: nil},
+		{name: "readUint32.a", fields: fields{[]byte{0, 0, 0, 0}, 0}, want: 0, wantErr: false},
+		{name: "readUint32.b", fields: fields{[]byte{255, 255, 255, 255}, 0}, want: 4294967295, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -387,8 +387,8 @@ func TestByteBufReader_ReadUint64(t *testing.T) {
 		want    uint64
 		wantErr bool
 	}{
-		{name: "readUint64.a", fields: fields{[]byte{0, 0, 0, 0, 0, 0, 0, 0}, 0}, want: 0, wantErr: nil},
-		{name: "readUint64.b", fields: fields{[]byte{-1, -1, -1, -1, -1, -1, -1, 127}, 0}, want: 9223372036854775807, wantErr: nil},
+		{name: "readUint64.a", fields: fields{[]byte{0, 0, 0, 0, 0, 0, 0, 0}, 0}, want: 0, wantErr: false},
+		{name: "readUint64.b", fields: fields{[]byte{255, 255, 255, 255, 255, 255, 255, 127}, 0}, want: 9223372036854775807, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -416,13 +416,13 @@ func TestByteBufReader_ReadVarInt(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		want    int
+		want    uint64
 		wantErr bool
 	}{
-		{name: "readvarint.a", fields: fields{[]byte{100}, 0}, want: 100, wantErr: nil},
-		{name: "readvarint.b", fields: fields{[]byte{-2, 0, 0, 1, 0}, 0}, want: 65536, wantErr: nil},
-		{name: "readvarint.c", fields: fields{[]byte{-2, -1, -1, -1, 127}, 0}, want: 2147483647, wantErr: nil},
-		{name: "readvarint.d", fields: fields{[]byte{-1, -1, -1, -1, -1, -1, -1, -1, 127}, 0}, want: 9223372036854775807, wantErr: nil},
+		{name: "readvarint.a", fields: fields{[]byte{100}, 0}, want: 100, wantErr: false},
+		{name: "readvarint.b", fields: fields{[]byte{254, 0, 0, 1, 0}, 0}, want: 65536, wantErr: false},
+		{name: "readvarint.c", fields: fields{[]byte{254, 255, 255, 255, 127}, 0}, want: 2147483647, wantErr: false},
+		{name: "readvarint.d", fields: fields{[]byte{255, 255, 255, 255, 255, 255, 255, 255, 127}, 0}, want: 9223372036854775807, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

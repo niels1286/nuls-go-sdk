@@ -49,7 +49,7 @@ func (reader ByteBufReader) canRead(length int) bool {
 	if length == 0 {
 		return false
 	}
-	return length+reader.cursor >= len(reader.payload)
+	return length+reader.cursor <= len(reader.payload)
 }
 
 //从当前的字节序列中读取一个字节，并在游标加1
@@ -92,9 +92,14 @@ func (reader *ByteBufReader) ReadUint32() (uint32, error) {
 	reader.cursor += length
 	return mathutils.BytesToUint32(bytes), nil
 }
-func (reader *ByteBufReader) ReadVarInt() (int, error) {
 
+func (reader *ByteBufReader) ReadVarInt() (uint64, error) {
+	length := mathutils.GetVarIntLen(reader.payload, reader.cursor)
+	val := mathutils.BytesToVarIntByCursor(reader.payload, reader.cursor)
+	reader.cursor += length
+	return val, nil
 }
+
 func (reader *ByteBufReader) ReadUint64() (uint64, error) {
 	length := 8
 	if !reader.canRead(length) {
@@ -110,7 +115,8 @@ func (reader *ByteBufReader) ReadBytesWithLen() ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	return reader.ReadBytes(length)
+	//存在数据精度丢失的可能性
+	return reader.ReadBytes(int(length))
 }
 
 func (reader *ByteBufReader) ReadStringWithLen() (string, error) {

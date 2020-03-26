@@ -347,3 +347,27 @@ func Test_aliceReverse(t *testing.T) {
 		})
 	}
 }
+
+func TestGetVarIntLen(t *testing.T) {
+	type args struct {
+		bytes  []byte
+		cursor int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "varintlen.a", args: args{bytes: VarIntToBytes(100), cursor: 0}, want: 1},
+		{name: "varintlen.b", args: args{bytes: VarIntToBytes(1000), cursor: 0}, want: 3},
+		{name: "varintlen.c", args: args{bytes: VarIntToBytes(65536), cursor: 0}, want: 5},
+		{name: "varintlen.d", args: args{bytes: VarIntToBytes(9223372036854775807), cursor: 0}, want: 9},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetVarIntLen(tt.args.bytes, tt.args.cursor); got != tt.want {
+				t.Errorf("GetVarIntLen() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

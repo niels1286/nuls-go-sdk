@@ -150,18 +150,33 @@ func VarIntToBytes(value uint64) []byte {
 }
 
 func BytesToVarInt(bytes []byte) uint64 {
+	return BytesToVarIntByCursor(bytes, 0)
+}
+func BytesToVarIntByCursor(bytes []byte, cursor int) uint64 {
 	//val, _ := binary.Uvarint(bytes)
 	//return val
 	var value uint64
-	first := bytes[0]
+	first := bytes[cursor]
 	if first < 253 {
 		value = uint64(first)
 	} else if first == 253 {
-		value = uint64(BytesToUint16(bytes[1:3]))
+		value = uint64(BytesToUint16(bytes[cursor+1 : cursor+3]))
 	} else if first == 254 {
-		value = uint64(BytesToUint32(bytes[1:5]))
+		value = uint64(BytesToUint32(bytes[cursor+1 : cursor+5]))
 	} else {
-		value = uint64(BytesToUint64(bytes[1:9]))
+		value = uint64(BytesToUint64(bytes[cursor+1 : cursor+9]))
 	}
 	return value
+}
+
+func GetVarIntLen(bytes []byte, cursor int) int {
+	first := bytes[cursor]
+	if first < 253 {
+		return 1
+	} else if first == 253 {
+		return 3
+	} else if first == 254 {
+		return 5
+	}
+	return 9
 }
