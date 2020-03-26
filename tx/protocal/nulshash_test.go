@@ -37,7 +37,7 @@ func TestNulsHash_Parse(t *testing.T) {
 		hashHex string
 	}
 	type args struct {
-		reader seria.ByteBufReader
+		reader *seria.ByteBufReader
 	}
 	data, _ := hex.DecodeString("b1fa764412178e1eb2cb92616de84300a50b4790f84901000000000000000000")
 	tests := []struct {

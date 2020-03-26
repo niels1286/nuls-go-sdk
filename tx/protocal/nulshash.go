@@ -40,13 +40,18 @@ type NulsHash struct {
 	hashHex string
 }
 
+//创建一个新的hash对象
+func NewNulsHash(bytes []byte) *NulsHash {
+	return &NulsHash{bytes: bytes, hashHex: ""}
+}
+
 //序列化hash字节数组，长度为32位
 func (hash *NulsHash) Serialize() ([]byte, error) {
 	return hash.bytes, nil
 }
 
 //从reader中读取32个字节，赋值到hash中
-func (hash *NulsHash) Parse(reader seria.ByteBufReader) error {
+func (hash *NulsHash) Parse(reader *seria.ByteBufReader) error {
 	bytes, err := reader.ReadBytes(HashLength)
 	hash.bytes = bytes
 	return err

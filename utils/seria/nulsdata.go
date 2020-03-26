@@ -29,5 +29,5 @@ type NulsData interface {
 	//序列化方法
 	Serialize() ([]byte, error)
 	//反序列化方法
-	Parse(reader ByteBufReader) error
+	Parse(reader *ByteBufReader) error
 }

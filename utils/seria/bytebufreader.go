@@ -40,8 +40,8 @@ type ByteBufReader struct {
 }
 
 //创建一个读取器
-func NewByteBufReader(payload []byte, cursor int) ByteBufReader {
-	return ByteBufReader{payload, cursor}
+func NewByteBufReader(payload []byte, cursor int) *ByteBufReader {
+	return &ByteBufReader{payload, cursor}
 }
 
 //判断当前状态下，是否还可以继续读取length个字节的数据
