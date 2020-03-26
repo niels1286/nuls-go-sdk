@@ -34,40 +34,40 @@ type EcKey struct {
 }
 
 //随机生成新的公私钥对
-func NewEcKey() (EcKey, error) {
+func NewEcKey() (*EcKey, error) {
 	prikey, err := btcec.NewPrivateKey(btcec.S256())
 	if nil != err {
-		return EcKey{}, err
+		return nil, err
 	}
 	pubkey := prikey.PubKey()
-	return EcKey{prikey, pubkey}, nil
+	return &EcKey{prikey, pubkey}, nil
 }
 
 //根据私钥字符串，还原EcKey
-func FromPriKeyBytes(priBytes []byte) (EcKey, error) {
+func FromPriKeyBytes(priBytes []byte) (*EcKey, error) {
 	prikey, pubkey := btcec.PrivKeyFromBytes(btcec.S256(), priBytes)
-	return EcKey{prikey, pubkey}, nil
+	return &EcKey{prikey, pubkey}, nil
 }
 
 //获取hex编码后的私钥
-func (e EcKey) GetPriKeyHex() string {
+func (e *EcKey) GetPriKeyHex() string {
 	return hex.EncodeToString(e.GetPriKeyBytes())
 }
 
 //获取私钥字节数组
-func (e EcKey) GetPriKeyBytes() []byte {
+func (e *EcKey) GetPriKeyBytes() []byte {
 	return e.privateKey.Serialize()
 }
 
 //获取hex编码后的公钥
 //compressed代表是否压缩，true为压缩，false为不压缩
-func (e EcKey) GetPubKeyHex(compressed bool) string {
+func (e *EcKey) GetPubKeyHex(compressed bool) string {
 	return hex.EncodeToString(e.GetPubKeyBytes(compressed))
 }
 
 //获取公钥的字节数组
 //compressed代表是否压缩，true为压缩，false为不压缩
-func (e EcKey) GetPubKeyBytes(compressed bool) []byte {
+func (e *EcKey) GetPubKeyBytes(compressed bool) []byte {
 	if compressed {
 		return e.publicKey.SerializeCompressed()
 	}
@@ -75,20 +75,20 @@ func (e EcKey) GetPubKeyBytes(compressed bool) []byte {
 }
 
 //根据公钥还原eckey，可以进行签名验证及数据解密
-func FromPubKeyBytes(pubBytes []byte) (EcKey, error) {
+func FromPubKeyBytes(pubBytes []byte) (*EcKey, error) {
 	pubkey, err := btcec.ParsePubKey(pubBytes, btcec.S256())
 	if err != nil {
-		return EcKey{}, err
+		return nil, err
 	}
-	return EcKey{nil, pubkey}, nil
+	return &EcKey{nil, pubkey}, nil
 }
 
 //判断结构中的私钥是否为空
-func (e EcKey) IsPriKeyNil() bool {
+func (e *EcKey) IsPriKeyNil() bool {
 	return nil == e.privateKey
 }
 
-func (e EcKey) Sign(data []byte) ([]byte, error) {
+func (e *EcKey) Sign(data []byte) ([]byte, error) {
 	sig, err := e.privateKey.Sign(data)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (e EcKey) Sign(data []byte) ([]byte, error) {
 	return sig.Serialize(), nil
 }
 
-func (e EcKey) Verify(data, signature []byte) bool {
+func (e *EcKey) Verify(data, signature []byte) bool {
 	sig, err := btcec.ParseSignature(signature, btcec.S256())
 	if err != nil {
 		log.Fatal(err.Error())
@@ -106,7 +106,7 @@ func (e EcKey) Verify(data, signature []byte) bool {
 }
 
 //使用公钥加密数据
-func (e EcKey) Encrypt(data []byte) []byte {
+func (e *EcKey) Encrypt(data []byte) []byte {
 	val, err := btcec.Encrypt(e.publicKey, data)
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -116,7 +116,7 @@ func (e EcKey) Encrypt(data []byte) []byte {
 }
 
 //使用私钥解密以公钥加密的数据
-func (e EcKey) Decrypt(in []byte) []byte {
+func (e *EcKey) Decrypt(in []byte) []byte {
 	val, err := btcec.Decrypt(e.privateKey, in)
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -124,5 +124,3 @@ func (e EcKey) Decrypt(in []byte) []byte {
 	}
 	return val
 }
-
-//使用私钥解密由公钥加密的数据

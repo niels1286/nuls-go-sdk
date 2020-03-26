@@ -55,7 +55,7 @@ var PrefixTable = [...]string{"", "a", "b", "c", "d", "e"}
 //NULS大生态体系内的基本账户结构
 type Account struct {
 	//账户对应的公私钥对
-	eckey.EcKey
+	*eckey.EcKey
 	//地址，是用户操作的载体，账户余额管理、转账、数据权限等，全有地址来识别
 	//地址的格式为：address = prefix + Base58Encode(chainId+addressType+pkh+xor)
 	Address string
@@ -82,7 +82,7 @@ func NewNormalAccount(chainId uint16, prefix string) (*Account, error) {
 }
 
 //根据EcKey生成账户
-func getAccountByEckey(ec eckey.EcKey, chainId uint16, prefix string) (*Account, error) {
+func getAccountByEckey(ec *eckey.EcKey, chainId uint16, prefix string) (*Account, error) {
 	pubBytes := ec.GetPubKeyBytes(true)
 	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
 	address := GetStringAddress(addressBytes, prefix)
@@ -187,7 +187,7 @@ func ParseAccount(address string) (Account, error) {
 		AddressBytes: addressBytes,
 		ChainId:      chainId,
 		AccType:      accountType,
-		EcKey:        eckey.EcKey{},
+		EcKey:        nil,
 		Prefix:       prefix,
 	}, nil
 }
