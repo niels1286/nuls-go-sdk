@@ -42,6 +42,23 @@ type KeyStore struct {
 	version int
 }
 
+func (k KeyStore) GetAccount(password string, chainId uint16, prefix string) (*Account, error) {
+	if k.EncryptedPrivateKey == "" {
+		return nil, errors.New("Keystore is broken.")
+	}
+	data, err := hex.DecodeString(k.EncryptedPrivateKey)
+	if err != nil {
+		return nil, err
+	}
+	pwd := cryptoutils.Sha256h([]byte(password))
+	prikey := cryptoutils.AESDecrypt(data, pwd)
+	account, err := GetAccountFromPrkeyBytes(prikey, chainId, prefix)
+	if err != nil {
+		return nil, err
+	}
+	return account, nil
+}
+
 //从文件中读取keystore内容，根据内容还原账户数据
 func KeystoreFromFile(reader io.Reader) (KeyStore, error) {
 	store := KeyStore{}
@@ -53,7 +70,7 @@ func KeystoreFromFile(reader io.Reader) (KeyStore, error) {
 }
 
 //指定账户生成对应的keystore
-func CreateKeyStore(account Account, password string) (KeyStore, error) {
+func CreateKeyStore(account *Account, password string) (KeyStore, error) {
 	if !PasswordCheck(password) {
 		return KeyStore{}, errors.New("Invalid password format")
 	}

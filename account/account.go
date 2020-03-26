@@ -73,20 +73,20 @@ type Account struct {
 //创建一个新账户
 //chainId:账户所在链的ID，用于多链交互时，识别身份
 //prefix:地址前缀，每条链都可以定义自己的地址前缀
-func NewNormalAccount(chainId uint16, prefix string) (Account, error) {
+func NewNormalAccount(chainId uint16, prefix string) (*Account, error) {
 	ec, err := eckey.NewEcKey()
 	if err != nil {
-		return Account{}, err
+		return nil, err
 	}
 	return getAccountByEckey(ec, chainId, prefix)
 }
 
 //根据EcKey生成账户
-func getAccountByEckey(ec eckey.EcKey, chainId uint16, prefix string) (Account, error) {
+func getAccountByEckey(ec eckey.EcKey, chainId uint16, prefix string) (*Account, error) {
 	pubBytes := ec.GetPubKeyBytes(true)
 	addressBytes := GetAddressByPubBytes(pubBytes, chainId, NormalAccountType, prefix)
 	address := GetStringAddress(addressBytes, prefix)
-	return Account{
+	return &Account{
 		Address:      address,
 		AddressBytes: addressBytes,
 		ChainId:      chainId,
@@ -140,19 +140,19 @@ func calcXor(bytes []byte) byte {
 }
 
 //创建一个NULS主网账户
-func NewNULSAccount(count int) ([]Account, error) {
+func NewNULSAccount(count int) ([]*Account, error) {
 	return BatchNewAccount(count, NULSChainId, NULSPrefix)
 }
 
 //创建一个NULS测试网账户
-func NewTNULSAccount(count int) ([]Account, error) {
+func NewTNULSAccount(count int) ([]*Account, error) {
 	return BatchNewAccount(count, TNULSChainId, TNULSPrefix)
 }
 
 //批量创建账户
-func BatchNewAccount(count int, chainId uint16, prefix string) ([]Account, error) {
-	result := []Account{}
-	resultChannel := make(chan Account)
+func BatchNewAccount(count int, chainId uint16, prefix string) ([]*Account, error) {
+	result := []*Account{}
+	resultChannel := make(chan *Account)
 	for i := 0; i < count; i++ {
 		go func() {
 			account, err := NewNormalAccount(chainId, prefix)
@@ -179,7 +179,7 @@ func ParseAccount(address string) (Account, error) {
 	}
 	prefix, realAddressStr := getRealAddress(address)
 	bytes := base58.Decode(realAddressStr)
-	chainId := mathutils.BytesToUint16(bytes[0:1])
+	chainId := mathutils.BytesToUint16(bytes[0:2])
 	accountType := bytes[2]
 	addressBytes := bytes[0 : len(bytes)-1]
 	return Account{
@@ -203,7 +203,7 @@ func Valid(address string) bool {
 	if len(bytes) != AddressBytesLength+1 {
 		return false
 	}
-	chainId := mathutils.BytesToUint16(bytes[0:1])
+	chainId := mathutils.BytesToUint16(bytes[0:2])
 	//验证已知链的前缀是否正确
 	if chainId == NULSChainId && prefix != NULSPrefix {
 		return false
@@ -225,14 +225,17 @@ func Valid(address string) bool {
 }
 
 //根据私钥生成账户
-func GetAccountFromPrkey(priHex string, chainId uint16, prefix string) (Account, error) {
+func GetAccountFromPrkey(priHex string, chainId uint16, prefix string) (*Account, error) {
 	prikeyBytes, err := hex.DecodeString(priHex)
 	if err != nil {
-		return Account{}, err
+		return nil, err
 	}
+	return GetAccountFromPrkeyBytes(prikeyBytes, chainId, prefix)
+}
+func GetAccountFromPrkeyBytes(prikeyBytes []byte, chainId uint16, prefix string) (*Account, error) {
 	ec, err := eckey.FromPriKeyBytes(prikeyBytes)
 	if err != nil {
-		return Account{}, err
+		return nil, err
 	}
 	return getAccountByEckey(ec, chainId, prefix)
 }

@@ -211,6 +211,6 @@ func ExampleValid() {
 	result := Valid(address)
 
 	if !result {
-		log.Println("%s is not a right address", address)
+		log.Println(address + "is not a right address")
 	}
 }
