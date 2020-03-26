@@ -353,3 +353,26 @@ func TestByteBufWriter_writeVarint(t *testing.T) {
 		})
 	}
 }
+
+func TestByteBufWriter_serialize(t *testing.T) {
+	type fields struct {
+		stream []byte
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []byte
+	}{
+		{name: "serialize.a", fields: fields{stream: []byte{1, 2, 3, 4, 5, 6, 7, 8}}, want: []byte{1, 2, 3, 4, 5, 6, 7, 8}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			writer := &ByteBufWriter{
+				stream: tt.fields.stream,
+			}
+			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("serialize() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
