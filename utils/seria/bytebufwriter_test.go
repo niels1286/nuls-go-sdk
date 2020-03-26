@@ -54,8 +54,8 @@ func TestByteBufWriter_writeBigint(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeBigint(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteBigint(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -83,8 +83,8 @@ func TestByteBufWriter_writeBool(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeBool(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteBool(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -104,15 +104,15 @@ func TestByteBufWriter_writeByte(t *testing.T) {
 		args   args
 		want   []byte
 	}{
-		{name: "writeByte.a", fields: fields{stream: []byte{1, 2, 1, 2, 1, 2}}, args: args{b: 123}, want: []byte{1, 2, 1, 2, 1, 2, 123}},
+		{name: "WriteByte.a", fields: fields{stream: []byte{1, 2, 1, 2, 1, 2}}, args: args{b: 123}, want: []byte{1, 2, 1, 2, 1, 2, 123}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeByte(tt.args.b)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteByte(tt.args.b)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -139,8 +139,8 @@ func TestByteBufWriter_writeBytes(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeBytes(tt.args.bytes)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteBytes(tt.args.bytes)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -167,8 +167,8 @@ func TestByteBufWriter_writeBytesWithLen(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeBytesWithLen(tt.args.bytes)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteBytesWithLen(tt.args.bytes)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -195,8 +195,8 @@ func TestByteBufWriter_writeFloat64(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeFloat64(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteFloat64(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -223,8 +223,8 @@ func TestByteBufWriter_writeString(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeString(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteString(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -254,8 +254,8 @@ func TestByteBufWriter_writeUInt16(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeUInt16(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteUInt16(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -285,8 +285,8 @@ func TestByteBufWriter_writeUInt32(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeUInt32(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteUInt32(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -316,8 +316,8 @@ func TestByteBufWriter_writeUInt64(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeUInt64(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteUInt64(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -346,8 +346,8 @@ func TestByteBufWriter_writeVarint(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			writer.writeVarint(tt.args.val)
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			writer.WriteVarint(tt.args.val)
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("%s = %v, want %v", tt.name, got, tt.want)
 			}
 		})
@@ -370,7 +370,7 @@ func TestByteBufWriter_serialize(t *testing.T) {
 			writer := &ByteBufWriter{
 				stream: tt.fields.stream,
 			}
-			if got := writer.serialize(); !reflect.DeepEqual(got, tt.want) {
+			if got := writer.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("serialize() = %v, want %v", got, tt.want)
 			}
 		})

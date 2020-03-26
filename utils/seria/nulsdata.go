@@ -21,40 +21,13 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/25
-package txprotocal
+// @Author  Niels  2020/3/26
+package seria
 
-import (
-	"encoding/hex"
-	"github.com/niels1286/nuls-go-sdk/utils/seria"
-)
-
-//hash的字节长度，默认为32
-const HashLength = 32
-
-//交易hash和区块hash的结构体
-type NulsHash struct {
-	//实际字节数据
-	bytes []byte
-	//缓存的字符串数据
-	hashHex string
-}
-
-//序列化hash字节数组，长度为32位
-func (hash *NulsHash) Serialize() ([]byte, error) {
-	return hash.bytes, nil
-}
-
-//从reader中读取32个字节，赋值到hash中
-func (hash *NulsHash) Parse(reader seria.ByteBufReader) error {
-	bytes, err := reader.ReadBytes(HashLength)
-	hash.bytes = bytes
-	return err
-}
-
-func (hash *NulsHash) String() string {
-	if len(hash.hashHex) == 0 {
-		hash.hashHex = hex.EncodeToString(hash.bytes)
-	}
-	return hash.hashHex
+//所有nuls的上链数据结构，都应该支持序列化和反序列化方法
+type NulsData interface {
+	//序列化方法
+	Serialize() ([]byte, error)
+	//反序列化方法
+	Parse(reader ByteBufReader) error
 }

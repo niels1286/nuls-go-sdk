@@ -36,54 +36,62 @@ type ByteBufWriter struct {
 	stream []byte
 }
 
-func (writer *ByteBufWriter) writeByte(b byte) {
+func (writer *ByteBufWriter) WriteByte(b byte) {
 	writer.stream = append(writer.stream, b)
 }
-func (writer *ByteBufWriter) writeBytes(bytes []byte) {
+func (writer *ByteBufWriter) WriteBytes(bytes []byte) {
 	writer.stream = append(writer.stream, bytes...)
 }
-func (writer *ByteBufWriter) writeBytesWithLen(bytes []byte) {
+func (writer *ByteBufWriter) WriteBytesWithLen(bytes []byte) {
 	writer.stream = append(writer.stream, mathutils.VarIntToBytes(uint64(len(bytes)))...)
 	writer.stream = append(writer.stream, bytes...)
 }
 
-func (writer *ByteBufWriter) writeUInt16(val uint16) {
+func (writer *ByteBufWriter) WriteUInt16(val uint16) {
 	writer.stream = append(writer.stream, mathutils.Uint16ToBytes(val)...)
 
 }
-func (writer *ByteBufWriter) writeUInt32(val uint32) {
+func (writer *ByteBufWriter) WriteUInt32(val uint32) {
 	writer.stream = append(writer.stream, mathutils.Uint32ToBytes(val)...)
 }
-func (writer *ByteBufWriter) writeUInt64(val uint64) {
+func (writer *ByteBufWriter) WriteUInt64(val uint64) {
 	writer.stream = append(writer.stream, mathutils.Uint64ToBytes(val)...)
 }
-func (writer *ByteBufWriter) writeVarint(val uint64) {
+func (writer *ByteBufWriter) WriteVarint(val uint64) {
 	writer.stream = append(writer.stream, mathutils.VarIntToBytes(val)...)
 }
-func (writer *ByteBufWriter) writeString(val string) {
-	writer.writeBytesWithLen([]byte(val))
+func (writer *ByteBufWriter) WriteString(val string) {
+	writer.WriteBytesWithLen([]byte(val))
 }
-func (writer *ByteBufWriter) writeBool(val bool) {
+func (writer *ByteBufWriter) WriteBool(val bool) {
 	if val {
-		writer.writeByte(1)
+		writer.WriteByte(1)
 	} else {
-		writer.writeByte(0)
+		writer.WriteByte(0)
 	}
 }
 
-func (writer *ByteBufWriter) writeBigint(val *big.Int) {
+func (writer *ByteBufWriter) WriteBigint(val *big.Int) {
 	bytes, err := mathutils.BigIntToBytes(val)
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
 	}
-	writer.writeBytes(bytes)
+	writer.WriteBytes(bytes)
 }
 
-func (writer *ByteBufWriter) writeFloat64(val float64) {
+func (writer *ByteBufWriter) WriteFloat64(val float64) {
 	writer.stream = append(writer.stream, mathutils.Float64ToBytes(val)...)
 }
+func (writer *ByteBufWriter) WriteNulsData(val NulsData) {
+	bytes, err := val.Serialize()
+	if err != nil {
+		log.Fatalf(err.Error())
+		return
+	}
+	writer.stream = append(writer.stream, bytes...)
+}
 
-func (writer *ByteBufWriter) serialize() []byte {
+func (writer *ByteBufWriter) Serialize() []byte {
 	return writer.stream
 }

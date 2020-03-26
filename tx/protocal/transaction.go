@@ -33,7 +33,7 @@ type Transaction struct {
 	//交易发生时间，精确到秒
 	time uint32
 	//交易的备注，默认为UTF-8编码的字符串
-	remark string
+	remark []byte
 	//交易业务扩展字段，任何需要上链的数据都可以放在这里
 	txData []byte
 	//资产交易数据，资产的转入、转出都需要在这里进行
@@ -43,22 +43,65 @@ type Transaction struct {
 }
 
 //将交易序列化为字节slice
-func (t Transaction) serialize() ([]byte, error) {
+func (t *Transaction) Serialize() ([]byte, error) {
+	writer := seria.ByteBufWriter{}
+	writer.WriteUInt16(t.txType)
+	writer.WriteUInt32(t.time)
+	writer.WriteBytesWithLen(t.remark)
+	writer.WriteBytesWithLen(t.txData)
+	writer.WriteBytesWithLen(t.coinData)
+	writer.WriteBytesWithLen(t.sigData)
+	return writer.Serialize(), nil
+}
 
+func (t *Transaction) Parse(reader seria.ByteBufReader) error {
+	txType, err := reader.ReadUint16()
+	if err != nil {
+		return err
+	}
+	t.txType = txType
+	time, err := reader.ReadUint32()
+	if err != nil {
+		return err
+	}
+	t.time = time
+	remarkBytes, err := reader.ReadBytesWithLen()
+	if err != nil {
+		return err
+	}
+	t.remark = remarkBytes
+
+	dataBytes, err := reader.ReadBytesWithLen()
+	if err != nil {
+		return err
+	}
+	t.txData = dataBytes
+
+	coinBytes, err := reader.ReadBytesWithLen()
+	if err != nil {
+		return err
+	}
+	t.coinData = coinBytes
+
+	signBytes, err := reader.ReadBytesWithLen()
+	if err != nil {
+		return err
+	}
+	t.sigData = signBytes
+	return nil
 }
 
 //将字节slice反序列化为交易结构体
 //@bytes 包含交易的完整的序列化数据的字节slice
 //@cursor 游标，从此开始解析交易
-func ParseTransaction(bytes []byte, cursor int) (Transaction, error) {
+func ParseTransaction(bytes []byte, cursor int) *Transaction {
 	return ParseTransactionByReader(seria.NewByteBufReader(bytes, cursor))
 }
 
 //从Reader中解析交易
 //@reader 字节slice数据阅读器，其中包含交易的完整序列化数据，且cursor刚好处于交易数据的起始点
-func ParseTransactionByReader(reader seria.ByteBufReader) (Transaction, error) {
+func ParseTransactionByReader(reader seria.ByteBufReader) *Transaction {
 	tx := Transaction{}
-	tx.txType = reader.ReadUint16()
-
-	return tx, nil
+	tx.Parse(reader)
+	return &tx
 }
