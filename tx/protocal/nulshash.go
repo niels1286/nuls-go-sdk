@@ -45,6 +45,12 @@ func NewNulsHash(bytes []byte) *NulsHash {
 	return &NulsHash{bytes: bytes, hashHex: ""}
 }
 
+//创建一个新的hash对象
+func ImportNulsHash(hashHex string) *NulsHash {
+	bytes, _ := hex.DecodeString(hashHex)
+	return NewNulsHash(bytes)
+}
+
 //序列化hash字节数组，长度为32位
 func (hash *NulsHash) Serialize() ([]byte, error) {
 	return hash.bytes, nil

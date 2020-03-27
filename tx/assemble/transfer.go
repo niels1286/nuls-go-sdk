@@ -27,15 +27,15 @@ package assemble
 import (
 	"github.com/niels1286/nuls-go-sdk/account"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
+	"log"
 	"math/big"
-	"time"
 )
 
 //交易的发出者，包含账户信息，资产信息，状态信息
 type Sender struct {
 	//转出账户
 	//要求账户必须包含私钥
-	Account account.Account
+	Account *account.Account
 	//资产的链id，
 	ChainId uint16
 	//资产id
@@ -76,6 +76,8 @@ type TransferParams struct {
 	Senders []Sender
 	//交易接收方信息
 	Receivers []Receiver
+	//交易时间
+	TimeUnix uint32
 	//交易备注
 	Remark string
 	//交易扩展数据
@@ -86,18 +88,42 @@ type TransferParams struct {
 func NewTransferTx(params *TransferParams) *txprotocal.Transaction {
 	tx := &txprotocal.Transaction{}
 	tx.TxType = txprotocal.TX_TYPE_TRANSFER
-	tx.Time = uint32(time.Now().Second())
+	tx.Time = params.TimeUnix
 	if params.Remark != "" {
 		tx.Remark = []byte(params.Remark)
 	}
 	tx.Extend = params.Extend
 	tx.CoinData = NewCoinData(params.Senders, params.Receivers)
-	tx.SignData = NewSignData(params.Senders, tx.GetHash())
+	hash, err := tx.GetHash().Serialize()
+	if err != nil {
+		log.Fatalln(err.Error())
+		return nil
+	}
+	tx.SignData = NewSignData(params.Senders, hash)
 	return tx
 }
 
-func NewSignData(senders []Sender, hash *txprotocal.NulsHash) []byte {
-
+//根据senders来生成签名数据
+func NewSignData(senders []Sender, hashBytes []byte) []byte {
+	sd := txprotocal.SignData{}
+	for _, sender := range senders {
+		sv, err := sender.Account.Sign(hashBytes)
+		if err != nil {
+			log.Fatalln(err.Error())
+			return nil
+		}
+		sig := txprotocal.P2PHKSignature{
+			PublicKey: sender.Account.GetPubKeyBytes(true),
+			SignValue: sv,
+		}
+		sd.Signatures = append(sd.Signatures, sig)
+	}
+	bytes, err := sd.Serialize()
+	if err != nil {
+		log.Fatalln(err.Error())
+		return nil
+	}
+	return bytes
 }
 
 //根据sender和receiver生成coindata字节数据
@@ -125,5 +151,9 @@ func NewCoinData(senders []Sender, receivers []Receiver) []byte {
 		}
 		cd.Tos = append(cd.Tos, to)
 	}
-	return cd
+	bytes, err := cd.Serialize()
+	if err != nil {
+		return nil
+	}
+	return bytes
 }

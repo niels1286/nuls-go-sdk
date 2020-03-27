@@ -27,7 +27,7 @@ package txprotocal
 import "github.com/niels1286/nuls-go-sdk/utils/seria"
 
 type SignData struct {
-	signatures []P2PHKSignature
+	Signatures []P2PHKSignature
 }
 
 type P2PHKSignature struct {
@@ -38,7 +38,7 @@ type P2PHKSignature struct {
 //序列化方法
 func (s *SignData) Serialize() ([]byte, error) {
 	writer := seria.NewByteBufWriter()
-	for _, sig := range s.signatures {
+	for _, sig := range s.Signatures {
 		writer.WriteByte(byte(len(sig.PublicKey)))
 		writer.WriteBytes(sig.PublicKey)
 		writer.WriteBytesWithLen(sig.SignValue)
@@ -62,7 +62,7 @@ func (s *SignData) Parse(reader *seria.ByteBufReader) error {
 		if err != nil {
 			return err
 		}
-		s.signatures = append(s.signatures, sig)
+		s.Signatures = append(s.Signatures, sig)
 	}
 	return nil
 }
