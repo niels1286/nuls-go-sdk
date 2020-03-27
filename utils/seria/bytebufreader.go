@@ -161,3 +161,7 @@ func (reader *ByteBufReader) GetPayload() []byte {
 func (reader *ByteBufReader) GetCursor() int {
 	return reader.cursor
 }
+
+func (reader *ByteBufReader) IsFinished() bool {
+	return len(reader.payload) == reader.cursor
+}

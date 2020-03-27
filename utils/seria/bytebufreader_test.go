@@ -495,3 +495,35 @@ func TestNewByteBufReader(t *testing.T) {
 		})
 	}
 }
+
+func TestByteBufReader_IsFinished(t *testing.T) {
+	type fields struct {
+		payload []byte
+		cursor  int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{name: "test isFinished.a", fields: fields{
+			payload: []byte{1, 2, 3, 4},
+			cursor:  4,
+		}, want: true},
+		{name: "test isFinished.a", fields: fields{
+			payload: []byte{1, 2, 3, 4},
+			cursor:  3,
+		}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reader := &ByteBufReader{
+				payload: tt.fields.payload,
+				cursor:  tt.fields.cursor,
+			}
+			if got := reader.IsFinished(); got != tt.want {
+				t.Errorf("IsFinished() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

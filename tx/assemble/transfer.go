@@ -28,6 +28,7 @@ import (
 	"github.com/niels1286/nuls-go-sdk/account"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
 	"math/big"
+	"time"
 )
 
 //交易的发出者，包含账户信息，资产信息，状态信息
@@ -46,6 +47,9 @@ type Sender struct {
 	//Nonce值是该账户的上一条花费资产的交易hash的后8个字节
 	//连续交易时，可以在应用端缓存nonce，用来组装下一个交易
 	Nonce []byte
+	//使用的资产是否是锁定资产
+	//0普通交易，-1解锁金额交易（退出共识，退出委托）
+	Locked byte
 }
 
 //交易的接收方，包含账户地址、资产信息、锁定信息
@@ -80,5 +84,46 @@ type TransferParams struct {
 
 //新建转账交易
 func NewTransferTx(params *TransferParams) *txprotocal.Transaction {
+	tx := &txprotocal.Transaction{}
+	tx.TxType = txprotocal.TX_TYPE_TRANSFER
+	tx.Time = uint32(time.Now().Second())
+	if params.Remark != "" {
+		tx.Remark = []byte(params.Remark)
+	}
+	tx.Extend = params.Extend
+	tx.CoinData = NewCoinData(params.Senders, params.Receivers)
+	tx.SignData = NewSignData(params.Senders, tx.GetHash())
+	return tx
+}
 
+func NewSignData(senders []Sender, hash *txprotocal.NulsHash) []byte {
+
+}
+
+//根据sender和receiver生成coindata字节数据
+func NewCoinData(senders []Sender, receivers []Receiver) []byte {
+	cd := txprotocal.CoinData{}
+	for _, sender := range senders {
+		from := txprotocal.CoinFrom{}
+		from.Address = sender.Account.AddressBytes
+		from.AssetsChainId = sender.ChainId
+		from.AssetsId = sender.AssetsId
+		from.Amount = sender.Amount
+		from.Nonce = sender.Nonce
+		from.Locked = sender.Locked
+		cd.Froms = append(cd.Froms, from)
+	}
+	for _, receiver := range receivers {
+		to := txprotocal.CoinTo{
+			Coin: txprotocal.Coin{
+				Address:       receiver.Address,
+				AssetsChainId: receiver.ChainId,
+				AssetsId:      receiver.AssetsId,
+				Amount:        receiver.Amount,
+			},
+			LockValue: receiver.LockValue,
+		}
+		cd.Tos = append(cd.Tos, to)
+	}
+	return cd
 }
