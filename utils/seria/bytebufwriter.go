@@ -36,6 +36,10 @@ type ByteBufWriter struct {
 	stream []byte
 }
 
+func NewByteBufWriter() *ByteBufWriter {
+	return &ByteBufWriter{}
+}
+
 func (writer *ByteBufWriter) WriteByte(b byte) {
 	writer.stream = append(writer.stream, b)
 }

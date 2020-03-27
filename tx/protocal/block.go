@@ -47,7 +47,7 @@ func ParseBlock(bytes []byte) *Block {
 
 //将区块完整数据序列化为字节数组
 func (b *Block) Serialize() []byte {
-	writer := seria.ByteBufWriter{}
+	writer := seria.NewByteBufWriter()
 	writer.WriteNulsData(b.Header)
 	for _, tx := range b.Txs {
 		writer.WriteNulsData(tx)
@@ -98,7 +98,7 @@ func (h *BlockHeader) SerializeForHash() ([]byte, error) {
 	return h.serialize(false)
 }
 func (h *BlockHeader) serialize(withSign bool) ([]byte, error) {
-	writer := seria.ByteBufWriter{}
+	writer := seria.NewByteBufWriter()
 	writer.WriteNulsData(h.PreHash)
 	writer.WriteNulsData(h.MerkleRoot)
 	writer.WriteUInt32(h.Time)

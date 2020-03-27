@@ -76,7 +76,7 @@ func (t *Transaction) SerializeForHash() ([]byte, error) {
 }
 
 func (t *Transaction) serialize(withSign bool) ([]byte, error) {
-	writer := seria.ByteBufWriter{}
+	writer := seria.NewByteBufWriter()
 	writer.WriteUInt16(t.TxType)
 	writer.WriteUInt32(t.Time)
 	writer.WriteBytesWithLen(t.Remark)

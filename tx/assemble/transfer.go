@@ -34,26 +34,51 @@ import (
 type Sender struct {
 	//转出账户
 	//要求账户必须包含私钥
-	account account.Account
-	chainId uint16
-	assetId uint16
-	amount  *big.Int
-	nonce   []byte
-}
-type Receiver struct {
-	address   []byte
-	chainId   uint16
-	assetId   uint16
-	amount    *big.Int
-	lockValue uint64
-}
-type TransferParams struct {
-	senders   []Sender
-	receivers []Receiver
-	remark    string
-	extend    []byte
+	Account account.Account
+	//资产的链id，
+	ChainId uint16
+	//资产id
+	AssetsId uint16
+	//资产的数量，将小数位数左移到小数点之前，已整数的方式进行使用
+	Amount *big.Int
+	//账户当前的nonce值，
+	//需要从区块链上获取，保证nonce值的有效性
+	//Nonce值是该账户的上一条花费资产的交易hash的后8个字节
+	//连续交易时，可以在应用端缓存nonce，用来组装下一个交易
+	Nonce []byte
 }
 
+//交易的接收方，包含账户地址、资产信息、锁定信息
+type Receiver struct {
+	//接收方地址
+	Address []byte
+	//资产的链id
+	ChainId uint16
+	//资产id
+	AssetsId uint16
+	//资产数量
+	Amount *big.Int
+	//资产锁定标识
+	//lockValue == -1时，代表业务锁定，只能通过对应的解锁交易进行解锁
+	//lockValue < 10,000,000时，代表区块高度，当网络高度超过这个数值时，自动解锁（可以使用）
+	//10,000,000<lockValue<1,000,000,000,000时，代表当前时间（秒），当时间晚于此值时，自动解锁（可以使用）
+	//lockValue>1,000,000,000,000时，代表当前时间（毫秒），当时间晚于此值时，自动解锁（可以使用）
+	LockValue uint64
+}
+
+//交易组装参数，用于普通组装转账交易
+type TransferParams struct {
+	//交易发送方信息
+	Senders []Sender
+	//交易接收方信息
+	Receivers []Receiver
+	//交易备注
+	Remark string
+	//交易扩展数据
+	Extend []byte
+}
+
+//新建转账交易
 func NewTransferTx(params *TransferParams) *txprotocal.Transaction {
 
 }

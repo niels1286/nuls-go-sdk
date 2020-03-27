@@ -76,8 +76,8 @@ func TestAccount(t *testing.T) {
 			"NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55",
 			"tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG",
 		}
-		values := []Account{{Address: "NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55", ChainId: NULSChainId, AccType: NormalAccountType, EcKey: eckey.EcKey{}, Prefix: NULSPrefix},
-			{Address: "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG", ChainId: TNULSChainId, AccType: NormalAccountType, EcKey: eckey.EcKey{}, Prefix: TNULSPrefix}}
+		values := []Account{{Address: "NULSd6HgUjZWkqNSiunmdpfoLw4wMdSAsvL55", ChainId: NULSChainId, AccType: NormalAccountType, EcKey: &eckey.EcKey{}, Prefix: NULSPrefix},
+			{Address: "tNULSeBaMvEtDfvZuukDf2mVyfGo3DdiN8KLRG", ChainId: TNULSChainId, AccType: NormalAccountType, EcKey: &eckey.EcKey{}, Prefix: TNULSPrefix}}
 		for index, address := range cases {
 			account, err := ParseAccount(address)
 			if err != nil {
