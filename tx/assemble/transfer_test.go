@@ -29,8 +29,10 @@ import (
 	"github.com/niels1286/nuls-go-sdk/account"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
 	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
+	"log"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestNewCoinData(t *testing.T) {
@@ -156,4 +158,59 @@ func TestNewTransferTx(t *testing.T) {
 			}
 		})
 	}
+}
+
+//组装转账交易示例
+func ExampleNewTransferTx() {
+	//需求：用户a需要转100个nuls给用户B，花费手续费0.001个nuls。交易组装过程如下：
+	//step 1: 首先要准备账户A的私钥或者keystore，保证账户A，拥有签名能力
+	priHex := "230cb8ebbf3a2c581d27f98f7a38f8b07c1ff170d605ca645db4ffa05ffa5505"
+	accountA, _ := account.GetAccountFromPrkey(priHex, account.NULSChainId, account.NULSPrefix)
+	//step 2: 准备接收人地址，账户B地址
+	addressB := "NULSd6HgdNumANdW3LxB7NEZd4oa7otR4LkPN"
+	//step 3: 确认账户A，有足够转账的资产余额，并获取当前的nonce值
+	//todo 未来通过client中的请求，从节点处获取真实数据，此处暂时模拟
+	nonce := []byte{0, 1, 2, 3, 4, 5, 6, 7}
+	//step 4 :准备组装参数
+	//提前准备好两个数值，nuls的小数位数为8位，所以100.001(加手续费)个NULS，用bigint表示，就是下面情况：
+	amount1, _ := mathutils.StringToBigInt("10000100000")
+	amount2, _ := mathutils.StringToBigInt("10000000000")
+	params := &TransferParams{
+		Senders: []Sender{{
+			Account:  accountA,
+			ChainId:  1,
+			AssetsId: 1,
+			Amount:   amount1,
+			Nonce:    nonce,
+			Locked:   0,
+		}},
+		Receivers: []Receiver{{
+			Address:   account.AddressStrToBytes(addressB),
+			ChainId:   1,
+			AssetsId:  1,
+			Amount:    amount2,
+			LockValue: 0,
+		}},
+		//这里是系统时间，代表交易发生时间
+		TimeUnix: uint32(time.Now().Unix()),
+		//备注可以设置为业务数据，也可以是任何字符串
+		Remark: "test create transfer tx",
+		//在做系统扩展是，可以通过Extend进行业务数据的存储
+		Extend: []byte("test extend data."),
+	}
+	//调用交易生成函数
+	tx := NewTransferTx(params)
+	//step 5:将交易转换为hex
+	bytes, err := tx.Serialize()
+	if err != nil {
+		//序列化失败，则组装失败
+		log.Fatalln("Transaction create failed,case:" + err.Error())
+		return
+	}
+	txHex := hex.EncodeToString(bytes)
+	//step 6:调用api接口，将交易广播到区块链网络中
+	//todo 待实现，用打印进行模拟
+	log.Println("New transfer tx:" + txHex)
+	//step 7: 等待交易确认，在交易确认后，应用可以进行后续业务操作
+	//Done.
 }
