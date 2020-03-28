@@ -19,7 +19,60 @@
  */
 package clientquery
 
-//
-//func GetAccountInfo(address string) *AccountStatus {
-//
-//}
+import (
+	"encoding/hex"
+	"errors"
+	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
+	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
+	"math/big"
+	"math/rand"
+	"time"
+)
+
+type AccountStatus struct {
+	//账户地址
+	Address string
+	//可用余额
+	Balance *big.Int
+	//当前nonce值
+	Nonce []byte
+	//该nonce值的类型，1：已确认的nonce值,0：未确认的nonce值
+	NonceType int
+	//总的余额：可用+锁定
+	TotalBalance *big.Int
+}
+
+//获取指定链上指定地址的指定资产的相对应的余额和nonce状态
+func GetAccountInfo(client *jsonrpc.BasicClient, address string, chainId, assetsChainId, assetsId int) (*AccountStatus, error) {
+	if client == nil || address == "" {
+		return nil, errors.New("parameter wrong.")
+	}
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getAccountBalance", []interface{}{chainId, assetsChainId, assetsId, address})
+	result, err := client.Request(param)
+	if err != nil {
+		return nil, err
+	}
+	resultMap := result.Result.(map[string]interface{})
+	balance, err := mathutils.StringToBigInt(resultMap["balance"].(string))
+	if err != nil {
+		return nil, err
+	}
+	nonceHex := resultMap["nonce"].(string)
+	nonce, err := hex.DecodeString(nonceHex)
+	if err != nil {
+		return nil, err
+	}
+	nonceType := resultMap["nonceType"].(float64)
+	totalBalance, err := mathutils.StringToBigInt(resultMap["totalBalance"].(string))
+	if err != nil {
+		return nil, err
+	}
+	return &AccountStatus{
+		Address:      address,
+		Balance:      balance,
+		Nonce:        nonce,
+		NonceType:    int(nonceType),
+		TotalBalance: totalBalance,
+	}, nil
+}

@@ -22,7 +22,7 @@
 // @Title
 // @Description
 // @Author  Niels  2020/3/28
-package basic
+package jsonrpc
 
 import (
 	"bytes"
