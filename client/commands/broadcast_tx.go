@@ -22,44 +22,4 @@
 // @Title
 // @Description
 // @Author  Niels  2020/3/28
-package clientquery
-
-import (
-	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
-	"testing"
-)
-
-func TestGetAccountInfo(t *testing.T) {
-	type args struct {
-		client        *jsonrpc.BasicClient
-		address       string
-		chainId       int
-		assetsChainId int
-		assetsId      int
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{name: "test get account info.a", args: args{
-			client:        jsonrpc.NewJSONRPCClient("http://beta.api.nuls.io/jsonrpc"),
-			address:       "tNULSeBaMoG1oaW1JZnh6Ly65Ttp6raeTFBfCG",
-			chainId:       2,
-			assetsChainId: 2,
-			assetsId:      1,
-		}, wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetAccountInfo(tt.args.client, tt.args.address, tt.args.chainId, tt.args.assetsChainId, tt.args.assetsId)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetAccountInfo() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got.Balance.String() == "" {
-				t.Errorf("GetAccountInfo() failed.")
-			}
-		})
-	}
-}
+package commands
