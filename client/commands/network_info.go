@@ -38,7 +38,7 @@ type NetworkInfo struct {
 	InCount int `json:""`
 }
 
-//获取指定链上指定地址的指定资产的相对应的余额和nonce状态
+//获取api服务节点的网络状态
 func GetNetworkInfo(client *jsonrpc.BasicClient) (*NetworkInfo, error) {
 
 	rand.Seed(time.Now().Unix())

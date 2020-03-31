@@ -30,7 +30,7 @@ import (
 	"time"
 )
 
-//获取指定链上指定地址的指定资产的相对应的余额和nonce状态
+//根据高度获取对应区块的完整数据，hex格式
 func GetBlockHex(client *jsonrpc.BasicClient, chainId uint16, height uint64) (string, error) {
 	rand.Seed(time.Now().Unix())
 	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getBlockSerializationByHeight", []interface{}{chainId, height})
