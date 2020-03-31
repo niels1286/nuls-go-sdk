@@ -21,34 +21,23 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/28
-package nuls
+// @Author  Niels  2020/3/31
+package commands
 
 import (
-	"github.com/niels1286/nuls-go-sdk/client/commands"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
+	"math/rand"
+	"time"
 )
 
-type NulsSdk struct {
-	client  *jsonrpc.BasicClient
-	chainId uint16
-}
-
-func NewNulsSdk(jsonrpcURL string, chainId uint16) *NulsSdk {
-	return &NulsSdk{client: jsonrpc.NewJSONRPCClient(jsonrpcURL), chainId: chainId}
-}
-
-//获取账户对应资产的余额
-func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId int) (*commands.AccountStatus, error) {
-	return commands.GetAccountInfo(sdk.client, address, sdk.chainId, assetsChainId, assetsId)
-}
-
-//获取api节点的网络连接状况
-func (sdk *NulsSdk) GetNetworkInfo() (*commands.NetworkInfo, error) {
-	return commands.GetNetworkInfo(sdk.client)
-}
-
-//根据高度获取区块hex
-func (sdk *NulsSdk) GetBlockHex(height uint64) (string, error) {
-	return commands.GetBlockHex(sdk.client, sdk.chainId, height)
+//获取指定链上指定地址的指定资产的相对应的余额和nonce状态
+func GetBlockHex(client *jsonrpc.BasicClient, chainId uint16, height uint64) (string, error) {
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getBlockSerializationByHeight", []interface{}{chainId, height})
+	result, err := client.Request(param)
+	if err != nil {
+		return "", err
+	}
+	blockHex := result.Result.(string)
+	return blockHex, nil
 }
