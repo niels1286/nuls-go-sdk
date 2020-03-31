@@ -21,31 +21,39 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/28
-package commands
+// @Author  Niels  2020/3/31
+package ps
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
-	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
-	"math/rand"
-	"time"
+	"testing"
 )
 
-func GetTransactionJson(client *jsonrpc.BasicClient, chainId uint16, txHash *txprotocal.NulsHash) (string, error) {
-	if client == nil || txHash == nil {
-		return "", errors.New("parameter wrong.")
+func TestGetAllAgents(t *testing.T) {
+	type args struct {
+		client  *jsonrpc.NulsPSClient
+		chainId uint16
 	}
-	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getTx", []interface{}{chainId, txHash.String()})
-	result, err := client.Request(param)
-	if err != nil {
-		return "", err
+	tests := []struct {
+		name    string
+		args    args
+		want    []map[string]interface{}
+		wantErr bool
+	}{
+		{name: "getAgents.ps.a", args: args{
+			client:  jsonrpc.NewNulsPSClient("https://public1.nuls.io"),
+			chainId: 1,
+		}, want: nil, wantErr: false},
 	}
-	txJson, err := json.Marshal(result.Result)
-	if err != nil {
-		return "", err
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetAllAgents(tt.args.client, tt.args.chainId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetAllAgents() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			fmt.Println(len(got))
+		})
 	}
-	return string(txJson), nil
 }

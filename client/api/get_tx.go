@@ -22,44 +22,30 @@
 // @Title
 // @Description
 // @Author  Niels  2020/3/28
-package commands
+package api
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
-	"testing"
+	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
+	"math/rand"
+	"time"
 )
 
-func TestGetAccountInfo(t *testing.T) {
-	type args struct {
-		client        *jsonrpc.BasicClient
-		address       string
-		chainId       int
-		assetsChainId int
-		assetsId      int
+func GetTransactionJson(client *jsonrpc.NulsApiClient, chainId uint16, txHash *txprotocal.NulsHash) (string, error) {
+	if client == nil || txHash == nil {
+		return "", errors.New("parameter wrong.")
 	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{name: "test get account info.a", args: args{
-			client:        jsonrpc.NewJSONRPCClient("http://beta.api.nuls.io/jsonrpc"),
-			address:       "tNULSeBaMoG1oaW1JZnh6Ly65Ttp6raeTFBfCG",
-			chainId:       2,
-			assetsChainId: 2,
-			assetsId:      1,
-		}, wantErr: false},
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getTx", []interface{}{chainId, txHash.String()})
+	result, err := client.ApiRequest(param)
+	if err != nil {
+		return "", err
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetAccountInfo(tt.args.client, tt.args.address, tt.args.chainId, tt.args.assetsChainId, tt.args.assetsId)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetAccountInfo() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got.Balance.String() == "" {
-				t.Errorf("GetAccountInfo() failed.")
-			}
-		})
+	txJson, err := json.Marshal(result.Result)
+	if err != nil {
+		return "", err
 	}
+	return string(txJson), nil
 }

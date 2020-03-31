@@ -21,5 +21,23 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/28
-package commands
+// @Author  Niels  2020/3/31
+package api
+
+import (
+	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
+	"math/rand"
+	"time"
+)
+
+//根据高度获取对应区块的完整数据，hex格式
+func GetBlockHex(client *jsonrpc.NulsApiClient, chainId uint16, height uint64) (string, error) {
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getBlockSerializationByHeight", []interface{}{chainId, height})
+	result, err := client.ApiRequest(param)
+	if err != nil {
+		return "", err
+	}
+	blockHex := result.Result.(string)
+	return blockHex, nil
+}

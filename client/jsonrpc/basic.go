@@ -78,14 +78,26 @@ type JsonRpcClient interface {
 	Request(param *RequestParam) (*RequestResult, error)
 }
 
-type BasicClient struct {
+type NulsApiClient struct {
+	client *http.Client
+	url    string
+}
+type NulsPSClient struct {
 	client *http.Client
 	url    string
 }
 
-//新建一个客户端，用来访问链上数据
-func NewJSONRPCClient(url string) *BasicClient {
-	return &BasicClient{
+//新建一个客户端，用来访问链上数据,通过api模块接口
+func NewNulsApiClient(url string) *NulsApiClient {
+	return &NulsApiClient{
+		client: &http.Client{},
+		url:    url,
+	}
+}
+
+//新建一个客户端，用来访问链上数据,通过public-service模块
+func NewNulsPSClient(url string) *NulsPSClient {
+	return &NulsPSClient{
 		client: &http.Client{},
 		url:    url,
 	}
@@ -107,19 +119,31 @@ func NewRequestParam(id int, method string, params interface{}) *RequestParam {
 //接口请求
 //请求的地址是client中的默认地址
 //本工具针对NULS的api模块的jsonrpc接口进行设计，适用范围有限
-func (c *BasicClient) Request(param *RequestParam) (*RequestResult, error) {
+func (c *NulsApiClient) ApiRequest(param *RequestParam) (*RequestResult, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
+	return request(c.client, c.url, param)
+}
 
-	req, err := http.NewRequest("POST", c.url, bytes.NewReader(param.ToJsonBytes()))
+//接口请求
+//请求的地址是client中的默认地址
+//本工具针对NULS的api模块的jsonrpc接口进行设计，适用范围有限
+func (c *NulsPSClient) PSRequest(param *RequestParam) (*RequestResult, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+	return request(c.client, c.url, param)
+}
+func request(client *http.Client, url string, param *RequestParam) (*RequestResult, error) {
+	req, err := http.NewRequest("POST", url, bytes.NewReader(param.ToJsonBytes()))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 
-	resp, err := c.client.Do(req)
+	resp, err := client.Do(req)
 
 	defer resp.Body.Close()
 

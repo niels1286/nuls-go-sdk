@@ -22,22 +22,27 @@
 // @Title
 // @Description
 // @Author  Niels  2020/3/31
-package commands
+package ps
 
 import (
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
 	"time"
 )
 
-//获取当前网络最新高度
-func GetBestHeight(client *jsonrpc.BasicClient, chainId uint16) (uint64, error) {
-	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getLatestHeight", []interface{}{chainId})
-	result, err := client.Request(param)
-	if err != nil {
-		return 0, err
+//查询所有共识节点的列表
+func GetAllAgents(client *jsonrpc.NulsPSClient, chainId uint16) ([]map[string]interface{}, error) {
+	if client == nil {
+		return nil, errors.New("parameter wrong.")
 	}
-	height := result.Result.(uint64)
-	return height, nil
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getConsensusNodes", []interface{}{chainId, 1, 1000, 0})
+	result, err := client.PSRequest(param)
+	if err != nil {
+		return nil, err
+	}
+	resultMap := result.Result.(map[string]interface{})
+	list := resultMap["list"].([]map[string]interface{})
+	return list, nil
 }

@@ -25,40 +25,47 @@
 package nuls
 
 import (
-	"github.com/niels1286/nuls-go-sdk/client/commands"
+	"github.com/niels1286/nuls-go-sdk/client/api"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
 )
 
 type NulsSdk struct {
-	client  *jsonrpc.BasicClient
-	chainId uint16
+	apiClient *jsonrpc.NulsApiClient
+	psClient  *jsonrpc.NulsPSClient
+	chainId   uint16
 }
 
-func NewNulsSdk(jsonrpcURL string, chainId uint16) *NulsSdk {
-	return &NulsSdk{client: jsonrpc.NewJSONRPCClient(jsonrpcURL), chainId: chainId}
+func NewNulsSdk(apiUrl string, psUrl string, chainId uint16) *NulsSdk {
+	return &NulsSdk{apiClient: jsonrpc.NewNulsApiClient(apiUrl), psClient: jsonrpc.NewNulsPSClient(psUrl), chainId: chainId}
 }
 
 //获取账户对应资产的余额
-func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId int) (*commands.AccountStatus, error) {
-	return commands.GetAccountInfo(sdk.client, address, sdk.chainId, assetsChainId, assetsId)
+func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId int) (*api.AccountStatus, error) {
+	return api.GetAccountInfo(sdk.apiClient, address, sdk.chainId, assetsChainId, assetsId)
 }
 
 //获取api节点的网络连接状况
-func (sdk *NulsSdk) GetNetworkInfo() (*commands.NetworkInfo, error) {
-	return commands.GetNetworkInfo(sdk.client)
+func (sdk *NulsSdk) GetNetworkInfo() (*api.NetworkInfo, error) {
+	return api.GetNetworkInfo(sdk.apiClient)
 }
 
 //根据高度获取区块hex
 func (sdk *NulsSdk) GetBlockHex(height uint64) (string, error) {
-	return commands.GetBlockHex(sdk.client, sdk.chainId, height)
+	return api.GetBlockHex(sdk.apiClient, sdk.chainId, height)
 }
 
 //获取最新区块高度˚
 func (sdk *NulsSdk) GetBestHeight() (uint64, error) {
-	return commands.GetBestHeight(sdk.client, sdk.chainId)
+	return api.GetBestHeight(sdk.apiClient, sdk.chainId)
 }
 
+//获取交易的详细信息
 func (sdk *NulsSdk) GetTxJson(txHash *txprotocal.NulsHash) (string, error) {
-	return commands.GetTransactionJson(sdk.client, sdk.chainId, txHash)
+	return api.GetTransactionJson(sdk.apiClient, sdk.chainId, txHash)
+}
+
+//根据地址获取节点信息
+func GetAgentByAddress(address string) {
+
 }

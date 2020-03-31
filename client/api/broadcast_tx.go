@@ -22,41 +22,34 @@
 // @Title
 // @Description
 // @Author  Niels  2020/3/28
-package commands
+package api
 
 import (
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
-	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
-	"testing"
+	"math/rand"
+	"time"
 )
 
-func TestGetTransactionJson(t *testing.T) {
-	type args struct {
-		client  *jsonrpc.BasicClient
-		chainId int
-		txHash  *txprotocal.NulsHash
+//将组装好的交易广播到网络中
+//@Returns
+//	string : 广播成功的交易的hash
+//	error  : 广播失败的提示信息
+func BroadcastTx(client *jsonrpc.NulsApiClient, chainId uint16, txhex string) (string, error) {
+	if client == nil || txhex == "" {
+		return "", errors.New("parameter wrong.")
 	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{name: "test get tx json.a", args: args{
-			client:  jsonrpc.NewJSONRPCClient("http://beta.api.nuls.io/jsonrpc"),
-			chainId: 2,
-			txHash:  txprotocal.ImportNulsHash("1187f8659b005600745452de3024f97db5806cbf6fbcdc8e004c79e16469142c"),
-		}, wantErr: false},
+	rand.Seed(time.Now().Unix())
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "broadcastTx", []interface{}{chainId, txhex})
+	result, err := client.ApiRequest(param)
+	if err != nil {
+		return "", err
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetTransactionJson(tt.args.client, tt.args.chainId, tt.args.txHash)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetTransactionJson() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if len(got) < 100 {
-				t.Errorf("GetTransactionJson() got = %v", got)
-			}
-		})
+	resultMap := result.Result.(map[string]interface{})
+	value := resultMap["value"].(bool)
+	if !value {
+		return "", errors.New("broadcast tx failed.")
 	}
+	hash := resultMap["hash"].(string)
+	return hash, nil
 }

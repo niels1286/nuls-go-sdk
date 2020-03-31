@@ -21,23 +21,31 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/31
-package commands
+// @Author  Niels  2020/3/28
+package api
 
 import (
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
 	"time"
 )
 
-//根据高度获取对应区块的完整数据，hex格式
-func GetBlockHex(client *jsonrpc.BasicClient, chainId uint16, height uint64) (string, error) {
+//将组装好的交易广播到网络中
+//@Returns
+//	string : 验证成功的交易的hash，如果为空则为失败
+//	error  : 验证失败的提示信息
+func ValidateTx(client *jsonrpc.NulsApiClient, chainId uint16, txhex string) (string, error) {
+	if client == nil || txhex == "" {
+		return "", errors.New("parameter wrong.")
+	}
 	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getBlockSerializationByHeight", []interface{}{chainId, height})
-	result, err := client.Request(param)
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "validateTx", []interface{}{chainId, txhex})
+	result, err := client.ApiRequest(param)
 	if err != nil {
 		return "", err
 	}
-	blockHex := result.Result.(string)
-	return blockHex, nil
+	resultMap := result.Result.(map[string]interface{})
+	value := resultMap["value"].(string)
+	return value, nil
 }

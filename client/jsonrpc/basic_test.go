@@ -75,11 +75,11 @@ func TestBasicClient_Request(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &BasicClient{
+			c := &NulsApiClient{
 				client: tt.fields.client,
 				url:    tt.fields.url,
 			}
-			got, err := c.Request(tt.args.param)
+			got, err := c.ApiRequest(tt.args.param)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Request() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -98,16 +98,16 @@ func TestNewHttpClient(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *BasicClient
+		want *NulsApiClient
 	}{
-		{name: "test new client.a", args: args{"https://api.nuls.io/jsonrpc"}, want: &BasicClient{
+		{name: "test new client.a", args: args{"https://api.nuls.io/jsonrpc"}, want: &NulsApiClient{
 			url:    "https://api.nuls.io/jsonrpc",
 			client: &http.Client{},
 		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewJSONRPCClient(tt.args.url); !reflect.DeepEqual(got, tt.want) {
+			if got := NewNulsApiClient(tt.args.url); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJSONRPCClient() = %v, want %v", got, tt.want)
 			}
 		})
@@ -183,7 +183,7 @@ func TestExample(t *testing.T) {
 }
 func ExampleBasicClient_Request() {
 	//step 1:首先创建一个client,用于访问测试网公共服务
-	client := NewJSONRPCClient("http://beta.api.nuls.io/jsonrpc")
+	client := NewNulsApiClient("http://beta.api.nuls.io/jsonrpc")
 	//step 2: 组装参数
 	params := NewRequestParam(
 		//id，是一个随机数，用于标识本次请求
@@ -193,7 +193,7 @@ func ExampleBasicClient_Request() {
 		//实际的参数，可以参考接口文档获得
 		[]interface{}{2, 2, 1, "tNULSeBaMoG1oaW1JZnh6Ly65Ttp6raeTFBfCG"})
 	//step 3: 调用请求
-	result, err := client.Request(params)
+	result, err := client.ApiRequest(params)
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
