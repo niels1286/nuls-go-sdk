@@ -47,6 +47,7 @@ func (y *YellowPunish) Parse(reader *seria.ByteBufReader) error {
 		}
 		y.AddressList = append(y.AddressList, address)
 	}
+	return nil
 }
 
 //序列化方法
