@@ -27,6 +27,7 @@ package nuls
 import (
 	"github.com/niels1286/nuls-go-sdk/client/commands"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
+	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
 )
 
 type NulsSdk struct {
@@ -56,4 +57,8 @@ func (sdk *NulsSdk) GetBlockHex(height uint64) (string, error) {
 //获取最新区块高度˚
 func (sdk *NulsSdk) GetBestHeight() (uint64, error) {
 	return commands.GetBestHeight(sdk.client, sdk.chainId)
+}
+
+func (sdk *NulsSdk) GetTxJson(txHash *txprotocal.NulsHash) (string, error) {
+	return commands.GetTransactionJson(sdk.client, sdk.chainId, txHash)
 }

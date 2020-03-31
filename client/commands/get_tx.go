@@ -33,7 +33,7 @@ import (
 	"time"
 )
 
-func GetTransactionJson(client *jsonrpc.BasicClient, chainId int, txHash *txprotocal.NulsHash) (string, error) {
+func GetTransactionJson(client *jsonrpc.BasicClient, chainId uint16, txHash *txprotocal.NulsHash) (string, error) {
 	if client == nil || txHash == nil {
 		return "", errors.New("parameter wrong.")
 	}
