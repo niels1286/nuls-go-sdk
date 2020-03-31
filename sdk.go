@@ -27,6 +27,7 @@ package nuls
 import (
 	"github.com/niels1286/nuls-go-sdk/client/api"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
+	"github.com/niels1286/nuls-go-sdk/client/ps"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
 )
 
@@ -66,6 +67,11 @@ func (sdk *NulsSdk) GetTxJson(txHash *txprotocal.NulsHash) (string, error) {
 }
 
 //根据地址获取节点信息
-func GetAgentByAddress(address string) {
+func (sdk *NulsSdk) GetAgentByAddress(address string) (*ps.AgentInfo, error) {
+	return ps.GetAgentByAddress(sdk.psClient, sdk.chainId, address)
+}
 
+//获取全部节点信息
+func (sdk *NulsSdk) GetAllAgent() ([]*ps.AgentInfo, error) {
+	return ps.GetAllAgents(sdk.psClient, sdk.chainId)
 }
