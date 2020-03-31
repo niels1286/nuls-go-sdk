@@ -54,7 +54,7 @@ func (y *RedPunish) Parse(reader *seria.ByteBufReader) error {
 	if err != nil {
 		return err
 	}
-
+	return nil
 }
 
 //序列化方法
