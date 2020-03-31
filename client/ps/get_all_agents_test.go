@@ -25,7 +25,6 @@
 package ps
 
 import (
-	"fmt"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"testing"
 )
@@ -53,7 +52,9 @@ func TestGetAllAgents(t *testing.T) {
 				t.Errorf("GetAllAgents() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			fmt.Println(len(got))
+			if len(got) < 10 {
+				t.Errorf("get all agents failed.")
+			}
 		})
 	}
 }

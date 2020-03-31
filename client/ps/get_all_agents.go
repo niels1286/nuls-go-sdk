@@ -26,13 +26,14 @@ package ps
 
 import (
 	"errors"
+	"github.com/goinggo/mapstructure"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
 	"time"
 )
 
 //查询所有共识节点的列表
-func GetAllAgents(client *jsonrpc.NulsPSClient, chainId uint16) ([]map[string]interface{}, error) {
+func GetAllAgents(client *jsonrpc.NulsPSClient, chainId uint16) ([]*AgentInfo, error) {
 	if client == nil {
 		return nil, errors.New("parameter wrong.")
 	}
@@ -43,6 +44,16 @@ func GetAllAgents(client *jsonrpc.NulsPSClient, chainId uint16) ([]map[string]in
 		return nil, err
 	}
 	resultMap := result.Result.(map[string]interface{})
-	list := resultMap["list"].([]map[string]interface{})
-	return list, nil
+	list := resultMap["list"].([]interface{})
+	finallyResult := []*AgentInfo{}
+	for _, obj := range list {
+		objMap := obj.(map[string]interface{})
+		agent := &AgentInfo{}
+		err = mapstructure.Decode(objMap, agent)
+		if err != nil {
+			return nil, err
+		}
+		finallyResult = append(finallyResult, agent)
+	}
+	return finallyResult, nil
 }

@@ -25,7 +25,6 @@
 package ps
 
 import (
-	"fmt"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"testing"
 )
@@ -53,7 +52,9 @@ func TestGetAgentByAddress(t *testing.T) {
 				t.Errorf("GetAgentByAddress() error = %v, wantErr false", err)
 				return
 			}
-			fmt.Println(got)
+			if got.AgentId == "" {
+				t.Errorf("get agent by address failed.")
+			}
 		})
 	}
 }
