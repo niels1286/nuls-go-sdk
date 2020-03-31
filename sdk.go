@@ -53,7 +53,7 @@ func (sdk *NulsSdk) GetBlockHex(height uint64) (string, error) {
 	return commands.GetBlockHex(sdk.client, sdk.chainId, height)
 }
 
-//获取最新区块高度
-func (sdk *NulsSdk) GetBestHeight() (string, error) {
+//获取最新区块高度˚
+func (sdk *NulsSdk) GetBestHeight() (uint64, error) {
 	return commands.GetBestHeight(sdk.client, sdk.chainId)
 }
