@@ -145,7 +145,7 @@ func ExampleNewNULSAccount() {
 	//一次生成10个账户
 	accounts, err := NewNULSAccount(10)
 	if err != nil {
-		log.Fatal("Create NULS mainnet account failed.")
+		log.Print("Create NULS mainnet account failed.")
 		return
 	}
 	for _, account := range accounts {
@@ -169,7 +169,7 @@ func ExampleNewTNULSAccount() {
 	//一次生成10个账户
 	accounts, err := NewTNULSAccount(10)
 	if err != nil {
-		log.Fatal("Create NULS mainnet account failed.")
+		log.Print("Create NULS mainnet account failed.")
 		return
 	}
 	for _, account := range accounts {
@@ -195,12 +195,12 @@ func ExampleGetAccountFromPrkey() {
 	//调用方法，生成NULS主网地址
 	account, err := GetAccountFromPrkey(prikey, NULSChainId, NULSPrefix)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Printf(err.Error())
 		return
 	}
 	//跟预先生成的地址做对比
 	if account.Address != "NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE" {
-		log.Fatalf("import account failed.")
+		log.Printf("import account failed.")
 	}
 	fmt.Println(account)
 }

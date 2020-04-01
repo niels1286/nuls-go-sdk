@@ -157,7 +157,7 @@ func BatchNewAccount(count int, chainId uint16, prefix string) ([]*Account, erro
 		go func() {
 			account, err := NewNormalAccount(chainId, prefix)
 			if err != nil {
-				log.Fatal("Create account failed.")
+				log.Print("Create account failed.")
 			}
 			resultChannel <- account
 		}()

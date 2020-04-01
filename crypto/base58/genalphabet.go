@@ -45,14 +45,14 @@ var b58 = [256]byte{`)
 func write(w io.Writer, b []byte) {
 	_, err := w.Write(b)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 }
 
 func main() {
 	fi, err := os.Create("alphabet.go")
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer fi.Close()
 

@@ -204,7 +204,7 @@ func ExampleNewTransferTx() {
 	bytes, err := tx.Serialize()
 	if err != nil {
 		//序列化失败，则组装失败
-		log.Fatalln("Transaction create failed,case:" + err.Error())
+		log.Println("Transaction create failed,case:" + err.Error())
 		return
 	}
 	txHex := hex.EncodeToString(bytes)

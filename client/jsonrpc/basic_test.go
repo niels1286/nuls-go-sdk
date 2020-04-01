@@ -195,7 +195,7 @@ func ExampleBasicClient_Request() {
 	//step 3: 调用请求
 	result, err := client.ApiRequest(params)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return
 	}
 	//step 4:处理结果，示例中只进行打印，如下（请求时间：2020-3-28)）

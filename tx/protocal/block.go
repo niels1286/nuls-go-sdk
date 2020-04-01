@@ -81,7 +81,7 @@ func (h *BlockHeader) GetHash() *NulsHash {
 	if h.hash == nil || len(h.hash.bytes) == 0 {
 		bytes, err := h.SerializeForHash()
 		if err != nil {
-			log.Fatalln(err.Error())
+			log.Println(err.Error())
 			return nil
 		}
 		bytes = cryptoutils.Sha256twice(bytes)

@@ -99,7 +99,7 @@ func (e *EcKey) Sign(data []byte) ([]byte, error) {
 func (e *EcKey) Verify(data, signature []byte) bool {
 	sig, err := btcec.ParseSignature(signature, btcec.S256())
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Print(err.Error())
 		return false
 	}
 	return sig.Verify(data, e.publicKey)
@@ -109,7 +109,7 @@ func (e *EcKey) Verify(data, signature []byte) bool {
 func (e *EcKey) Encrypt(data []byte) []byte {
 	val, err := btcec.Encrypt(e.publicKey, data)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Printf(err.Error())
 		return nil
 	}
 	return val
@@ -119,7 +119,7 @@ func (e *EcKey) Encrypt(data []byte) []byte {
 func (e *EcKey) Decrypt(in []byte) []byte {
 	val, err := btcec.Decrypt(e.privateKey, in)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Printf(err.Error())
 		return nil
 	}
 	return val

@@ -96,7 +96,7 @@ func NewTransferTx(params *TransferParams) *txprotocal.Transaction {
 	tx.CoinData = NewCoinData(params.Senders, params.Receivers)
 	hash, err := tx.GetHash().Serialize()
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil
 	}
 	tx.SignData = NewSignData(params.Senders, hash)
@@ -109,7 +109,7 @@ func NewSignData(senders []Sender, hashBytes []byte) []byte {
 	for _, sender := range senders {
 		sv, err := sender.Account.Sign(hashBytes)
 		if err != nil {
-			log.Fatalln(err.Error())
+			log.Println(err.Error())
 			return nil
 		}
 		sig := txprotocal.P2PHKSignature{
@@ -120,7 +120,7 @@ func NewSignData(senders []Sender, hashBytes []byte) []byte {
 	}
 	bytes, err := sd.Serialize()
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil
 	}
 	return bytes

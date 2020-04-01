@@ -35,7 +35,7 @@ var iv = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 func Encrypt(data, key []byte) []byte {
 	val, err := aesEncrypt(data, key, iv)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Print(err.Error())
 		return nil
 	}
 	return val
@@ -48,7 +48,7 @@ func Encrypt(data, key []byte) []byte {
 func Decrypt(data, key []byte) []byte {
 	val, err := aesDecrypt(data, key, iv)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Print(err.Error())
 		return nil
 	}
 	return val

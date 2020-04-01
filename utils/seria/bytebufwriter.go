@@ -78,7 +78,7 @@ func (writer *ByteBufWriter) WriteBool(val bool) {
 func (writer *ByteBufWriter) WriteBigint(val *big.Int) {
 	bytes, err := mathutils.BigIntToBytes(val)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return
 	}
 	writer.WriteBytes(bytes)
@@ -90,7 +90,7 @@ func (writer *ByteBufWriter) WriteFloat64(val float64) {
 func (writer *ByteBufWriter) WriteNulsData(val NulsData) {
 	bytes, err := val.Serialize()
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Printf(err.Error())
 		return
 	}
 	writer.stream = append(writer.stream, bytes...)

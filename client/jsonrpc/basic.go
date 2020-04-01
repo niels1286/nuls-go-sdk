@@ -47,7 +47,7 @@ type RequestParam struct {
 func (pp *RequestParam) ToJson() string {
 	data, err := json.Marshal(pp)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return ""
 	}
 	return string(data)
@@ -56,7 +56,7 @@ func (pp *RequestParam) ToJson() string {
 func (pp *RequestParam) ToJsonBytes() []byte {
 	data, err := json.Marshal(pp)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil
 	}
 	return data
