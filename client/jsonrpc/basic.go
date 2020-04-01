@@ -144,7 +144,9 @@ func request(client *http.Client, url string, param *RequestParam) (*RequestResu
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 
 	resp, err := client.Do(req)
-
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
