@@ -21,23 +21,40 @@
 
 // @Title
 // @Description
-// @Author  Niels  2020/3/31
+// @Author  Niels  2020/4/1
 package api
 
 import (
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
-	"math/rand"
-	"time"
+	"testing"
 )
 
-//获取当前网络最新高度
-func GetBestHeight(client *jsonrpc.NulsApiClient, chainId uint16) (uint64, error) {
-	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getLatestHeight", []interface{}{chainId})
-	result, err := client.ApiRequest(param)
-	if err != nil {
-		return 0, err
+func TestGetBestHeight(t *testing.T) {
+	type args struct {
+		client  *jsonrpc.NulsApiClient
+		chainId uint16
 	}
-	height := result.Result.(float64)
-	return uint64(height), nil
+	tests := []struct {
+		name    string
+		args    args
+		want    uint64
+		wantErr bool
+	}{
+		{name: "test get best height.a", args: args{
+			client:  jsonrpc.NewNulsApiClient("https://api.nuls.io/jsonrpc"),
+			chainId: 1,
+		}, wantErr: false, want: 100},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetBestHeight(tt.args.client, tt.args.chainId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetBestHeight() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got < tt.want {
+				t.Errorf("GetBestHeight() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
