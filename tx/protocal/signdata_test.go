@@ -44,12 +44,12 @@ func TestSignData_Parse(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		s       SignData
+		s       CommonSignData
 		args    args
 		wantErr bool
-		want    SignData
+		want    CommonSignData
 	}{
-		{name: "test sing parse", s: SignData{}, args: args{reader: seria.NewByteBufReader(all, 0)}, wantErr: false, want: SignData{[]P2PHKSignature{P2PHKSignature{
+		{name: "test sing parse", s: CommonSignData{}, args: args{reader: seria.NewByteBufReader(all, 0)}, wantErr: false, want: CommonSignData{[]P2PHKSignature{P2PHKSignature{
 			SignValue: sv,
 			PublicKey: pub,
 		}}}},
@@ -76,11 +76,11 @@ func TestSignData_Serialize(t *testing.T) {
 	all, _ := hex.DecodeString(allHex)
 	tests := []struct {
 		name    string
-		s       SignData
+		s       CommonSignData
 		want    []byte
 		wantErr bool
 	}{
-		{name: "sign serialize", s: SignData{[]P2PHKSignature{P2PHKSignature{
+		{name: "sign serialize", s: CommonSignData{[]P2PHKSignature{P2PHKSignature{
 			SignValue: sv,
 			PublicKey: pub,
 		}}}, want: all, wantErr: false},

@@ -105,7 +105,7 @@ func NewTransferTx(params *TransferParams) *txprotocal.Transaction {
 
 //根据senders来生成签名数据
 func NewSignData(senders []Sender, hashBytes []byte) []byte {
-	sd := txprotocal.SignData{}
+	sd := txprotocal.CommonSignData{}
 	for _, sender := range senders {
 		sv, err := sender.Account.Sign(hashBytes)
 		if err != nil {
