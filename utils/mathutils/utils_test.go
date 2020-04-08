@@ -371,3 +371,27 @@ func TestGetVarIntLen(t *testing.T) {
 		})
 	}
 }
+
+func TestGetStringAmount(t *testing.T) {
+	type args struct {
+		val   *big.Int
+		scale int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "test_decimal.a", args: args{
+			val:   big.NewInt(123456789),
+			scale: 8,
+		}, want: "1.23456789"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetStringAmount(tt.args.val, tt.args.scale); got != tt.want {
+				t.Errorf("GetStringAmount() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

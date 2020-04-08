@@ -23,6 +23,7 @@ package mathutils
 import (
 	"encoding/binary"
 	"errors"
+	"github.com/shopspring/decimal"
 	"math"
 	"math/big"
 )
@@ -179,4 +180,23 @@ func GetVarIntLen(bytes []byte, cursor int) int {
 		return 5
 	}
 	return 9
+}
+
+func GetStringAmount(val *big.Int, scale int) string {
+	decimal.DivisionPrecision = scale
+	value := decimal.NewFromBigInt(val, 0)
+	value = value.Div(decimal.NewFromBigInt(Pow(big.NewInt(10), scale), 0))
+	return value.Round(int32(scale)).String()
+}
+
+func Pow(x *big.Int, n int) *big.Int {
+	ret := big.NewInt(1) // 结果初始为0次方的值，整数0次方为1。如果是矩阵，则为单元矩阵。
+	for n != 0 {
+		if n%2 != 0 {
+			ret = ret.Mul(ret, x)
+		}
+		n /= 2
+		x = x.Mul(x, x)
+	}
+	return ret
 }
