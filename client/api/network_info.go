@@ -21,6 +21,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
 	"time"
@@ -47,6 +48,9 @@ func GetNetworkInfo(client *jsonrpc.NulsApiClient) (*NetworkInfo, error) {
 	result, err := client.ApiRequest(param)
 	if err != nil {
 		return nil, err
+	}
+	if nil == result || nil == result.Result {
+		return nil, errors.New("Get nil result.")
 	}
 	resultMap := result.Result.(map[string]interface{})
 	localHeight := resultMap["localBestHeight"].(int)

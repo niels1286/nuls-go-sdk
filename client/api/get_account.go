@@ -54,6 +54,9 @@ func GetAccountInfo(client *jsonrpc.NulsApiClient, address string, chainId uint1
 	if err != nil {
 		return nil, err
 	}
+	if nil == result || nil == result.Result {
+		return nil, errors.New("Get nil result.")
+	}
 	resultMap := result.Result.(map[string]interface{})
 	balance, err := mathutils.StringToBigInt(resultMap["balance"].(string))
 	if err != nil {

@@ -25,6 +25,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
 	"time"
@@ -37,6 +38,9 @@ func GetBestHeight(client *jsonrpc.NulsApiClient, chainId uint16) (uint64, error
 	result, err := client.ApiRequest(param)
 	if err != nil {
 		return 0, err
+	}
+	if nil == result || nil == result.Result {
+		return 0, errors.New("Get nil result.")
 	}
 	height := result.Result.(float64)
 	return uint64(height), nil

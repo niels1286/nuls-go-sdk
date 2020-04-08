@@ -45,6 +45,9 @@ func BroadcastTx(client *jsonrpc.NulsApiClient, chainId uint16, txhex string) (s
 	if err != nil {
 		return "", err
 	}
+	if nil == result || nil == result.Result {
+		return "", errors.New("Get nil result.")
+	}
 	resultMap := result.Result.(map[string]interface{})
 	value := resultMap["value"].(bool)
 	if !value {
