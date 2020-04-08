@@ -47,7 +47,7 @@ func CreateMultiAddress(chainId uint16, m uint8, pkHexSlice []string, prefix str
 		bytes, err := hex.DecodeString(pk)
 		if err != nil {
 			fmt.Println(err.Error())
-			return
+			return ""
 		}
 		writer.WriteBytes(bytes)
 	}
