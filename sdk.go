@@ -75,3 +75,8 @@ func (sdk *NulsSdk) GetAgentByAddress(address string) (*ps.AgentInfo, error) {
 func (sdk *NulsSdk) GetAllAgent() ([]*ps.AgentInfo, error) {
 	return ps.GetAllAgents(sdk.psClient, sdk.chainId)
 }
+
+//获取最新高度和hash
+func (sdk *NulsSdk) GetBestHeader() (*ps.HeaderInfo, error) {
+	return ps.GetBestHeader(sdk.psClient, sdk.chainId)
+}
