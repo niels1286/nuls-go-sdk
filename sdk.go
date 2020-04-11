@@ -25,6 +25,7 @@
 package nuls
 
 import (
+	"encoding/hex"
 	"github.com/niels1286/nuls-go-sdk/client/api"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"github.com/niels1286/nuls-go-sdk/client/ps"
@@ -79,4 +80,24 @@ func (sdk *NulsSdk) GetAllAgent() ([]*ps.AgentInfo, error) {
 //获取最新高度和hash
 func (sdk *NulsSdk) GetBestHeader() (*ps.HeaderInfo, error) {
 	return ps.GetBestHeader(sdk.psClient, sdk.chainId)
+}
+
+//广播交易
+func (sdk *NulsSdk) BroadcastTx(bytes []byte) (string, error) {
+	return api.BroadcastTx(sdk.apiClient, sdk.chainId, hex.EncodeToString(bytes))
+}
+
+//广播交易
+func (sdk *NulsSdk) BroadcastTxHex(txHex string) (string, error) {
+	return api.BroadcastTx(sdk.apiClient, sdk.chainId, txHex)
+}
+
+//验证交易
+func (sdk *NulsSdk) ValidateTx(bytes []byte) (string, error) {
+	return api.ValidateTx(sdk.apiClient, sdk.chainId, hex.EncodeToString(bytes))
+}
+
+//验证交易
+func (sdk *NulsSdk) ValidateTxHex(txHex string) (string, error) {
+	return api.ValidateTx(sdk.apiClient, sdk.chainId, txHex)
 }
