@@ -25,6 +25,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
@@ -46,6 +47,10 @@ func BroadcastTx(client *jsonrpc.NulsApiClient, chainId uint16, txhex string) (s
 		return "", err
 	}
 	if nil == result || nil == result.Result {
+		if result != nil && result.Error != nil {
+			bytes, _ := json.Marshal(result.Error)
+			return "", errors.New(string(bytes))
+		}
 		return "", errors.New("Get nil result.")
 	}
 	resultMap := result.Result.(map[string]interface{})

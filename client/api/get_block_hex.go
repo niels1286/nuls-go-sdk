@@ -25,6 +25,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
@@ -40,6 +41,10 @@ func GetBlockHex(client *jsonrpc.NulsApiClient, chainId uint16, height uint64) (
 		return "", err
 	}
 	if result == nil || result.Result == nil {
+		if result != nil && result.Error != nil {
+			bytes, _ := json.Marshal(result.Error)
+			return "", errors.New(string(bytes))
+		}
 		return "", errors.New("block is not exist.")
 	}
 	blockHex := result.Result.(string)

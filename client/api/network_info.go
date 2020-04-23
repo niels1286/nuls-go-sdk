@@ -21,6 +21,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"math/rand"
@@ -50,6 +51,10 @@ func GetNetworkInfo(client *jsonrpc.NulsApiClient) (*NetworkInfo, error) {
 		return nil, err
 	}
 	if nil == result || nil == result.Result {
+		if result != nil && result.Error != nil {
+			bytes, _ := json.Marshal(result.Error)
+			return nil, errors.New(string(bytes))
+		}
 		return nil, errors.New("Get nil result.")
 	}
 	resultMap := result.Result.(map[string]interface{})

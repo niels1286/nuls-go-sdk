@@ -44,6 +44,10 @@ func GetTransactionJson(client *jsonrpc.NulsApiClient, chainId uint16, txHash *t
 		return "", err
 	}
 	if nil == result || nil == result.Result {
+		if result != nil && result.Error != nil {
+			bytes, _ := json.Marshal(result.Error)
+			return "", errors.New(string(bytes))
+		}
 		return "", errors.New("Get nil result.")
 	}
 	txJson, err := json.Marshal(result.Result)
