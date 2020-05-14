@@ -116,8 +116,8 @@ func getRealAddress(address string) (prefix, realAddress string) {
 func GetStringAddress(bytes []byte, prefix string) string {
 	//将之前得到的所有字节，进行异或操作，得到结果追加到
 	xor := calcXor(bytes)
-	bytes = append(bytes, xor)
-	return prefix + PrefixTable[len(prefix)] + base58.Encode(bytes)
+	newbytes := append(bytes, xor)
+	return prefix + PrefixTable[len(prefix)] + base58.Encode(newbytes)
 }
 
 //根据公钥，生成账户地址
