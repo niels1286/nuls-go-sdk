@@ -22,8 +22,11 @@ package eckey
 
 import (
 	"encoding/hex"
+	"errors"
 	"github.com/btcsuite/btcd/btcec"
+	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
 	"log"
+	"math/big"
 )
 
 //用于管理公私钥的结构
@@ -45,6 +48,12 @@ func NewEcKey() (*EcKey, error) {
 
 //根据私钥字符串，还原EcKey
 func FromPriKeyBytes(priBytes []byte) (*EcKey, error) {
+
+	val := mathutils.BytesToBigInt(priBytes)
+	if val == nil || val.Cmp(big.NewInt(1)) <= 0 {
+		return nil, errors.New("Private key is wrong!")
+	}
+
 	prikey, pubkey := btcec.PrivKeyFromBytes(btcec.S256(), priBytes)
 	return &EcKey{prikey, pubkey}, nil
 }
@@ -76,6 +85,11 @@ func (e *EcKey) GetPubKeyBytes(compressed bool) []byte {
 
 //根据公钥还原eckey，可以进行签名验证及数据解密
 func FromPubKeyBytes(pubBytes []byte) (*EcKey, error) {
+	val := mathutils.BytesToBigInt(pubBytes)
+	if val == nil || val.Cmp(big.NewInt(1)) <= 0 {
+		return nil, errors.New("Private key is wrong!")
+	}
+
 	pubkey, err := btcec.ParsePubKey(pubBytes, btcec.S256())
 	if err != nil {
 		return nil, err

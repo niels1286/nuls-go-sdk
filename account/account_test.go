@@ -205,6 +205,23 @@ func ExampleGetAccountFromPrkey() {
 	fmt.Println(account)
 }
 
+//根据私钥创建账户的示例2
+func TestGetAccountFromPrkey2(t *testing.T) {
+	//私钥
+	prikey := "00"
+	//调用方法，生成NULS主网地址
+	account, err := GetAccountFromPrkey(prikey, 9, "NERVE")
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+	//跟预先生成的地址做对比
+	if account.Address != "NERVEepb64D18DSzBfDXwmZ9a1CRcYS33582us" {
+		log.Printf("import account failed.")
+	}
+	fmt.Println(account)
+}
+
 //地址验证是非常常用的功能，任何业务逻辑都应该先验证涉及的地址是否正确
 func ExampleValid() {
 	address := "tNULSeBaMgzeDmZQetKWfVb5AjsTg8SuzfRLiS"

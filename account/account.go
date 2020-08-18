@@ -27,6 +27,7 @@ import (
 	cryptoutils "github.com/niels1286/nuls-go-sdk/crypto/utils"
 	"github.com/niels1286/nuls-go-sdk/utils/mathutils"
 	"log"
+	"math/big"
 	"strings"
 )
 
@@ -122,6 +123,12 @@ func GetStringAddress(bytes []byte, prefix string) string {
 
 //根据公钥，生成账户地址
 func GetAddressByPubBytes(bytes []byte, chainId uint16, accountType uint8, prefix string) []byte {
+
+	val := mathutils.BytesToBigInt(bytes)
+	if val == nil || val.Cmp(big.NewInt(1)) <= 0 {
+		return nil
+	}
+
 	hash160 := cryptoutils.Hash160(bytes)
 	addressBytes := []byte{}
 	addressBytes = append(addressBytes, mathutils.Uint16ToBytes(chainId)...)
