@@ -21,6 +21,7 @@
 package account
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/niels1286/nuls-go-sdk/crypto/eckey"
 	"log"
@@ -92,15 +93,44 @@ func TestAccount(t *testing.T) {
 		}
 	})
 	t.Run("test import account", func(t *testing.T) {
-		prikey := "16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805"
-		account, err := GetAccountFromPrkey(prikey, NULSChainId, NULSPrefix)
-		if err != nil {
-			t.Fatalf(err.Error())
+		cases := []string{
+			"16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805",
+			"00",
+			"22",
 		}
-		if account.Address != "NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE" {
-			t.Fatalf("import account failed.")
+		values := []interface{}{"NULSd6Hgh2fZhgPTbQ1UTpSoXBxNotChyoYgE", "Private key is wrong!", "NULSd6Hghijtewk4ALkoJrHe3j7NeBpZ3tzdG"}
+		for index, prikey := range cases {
+			account, err := GetAccountFromPrkey(prikey, NULSChainId, NULSPrefix)
+			if err != nil && err.Error() != values[index] {
+				t.Fatalf(err.Error())
+			}
+			if err != nil {
+				continue
+			}
+			if account.Address != values[index] {
+				t.Fatalf("import account failed.")
+			}
 		}
+	})
 
+	t.Run("test pubkey import address", func(t *testing.T) {
+		cases := []string{
+			"16527f8847017225e39465cf98036fcf1c9b708bae24a38d139913d87e95e805",
+			"00",
+			"22",
+		}
+		values := []interface{}{"NULSd6HgVErgKZ86yMfyg4UAeS5p23MRKLjHQ", "", "NULSd6HgjT147nT1MDm3Q91DPNe3umkH9vQCc"}
+		for index, pubkey := range cases {
+			pub, _ := hex.DecodeString(pubkey)
+			addressBytes := GetAddressByPubBytes(pub, NULSChainId, 1, NULSPrefix)
+			if nil == addressBytes && "" == values[index] {
+				continue
+			}
+			address := GetStringAddress(addressBytes, NULSPrefix)
+			if address != values[index] {
+				t.Fatalf("import account failed.")
+			}
+		}
 	})
 }
 
