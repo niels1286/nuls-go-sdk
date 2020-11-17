@@ -53,7 +53,7 @@ type TokenBalance struct {
 }
 
 //获取指定链上指定地址的指定资产的相对应的余额和nonce状态
-func GetAccountInfo(client *jsonrpc.NulsApiClient, address string, chainId uint16, assetsChainId, assetsId int) (*AccountStatus, error) {
+func GetAccountInfo(client *jsonrpc.NulsApiClient, address string, chainId uint16, assetsChainId, assetsId uint16) (*AccountStatus, error) {
 	if client == nil || address == "" {
 		return nil, errors.New("parameter wrong.")
 	}

@@ -16,38 +16,45 @@ import (
 
 func main() {
 	sdk := nuls.NewNulsSdk("http://beta.api.nuls.io/jsonrpc/", "http://beta.wallet.nuls.io/api/", 2)
-	acc, _ := account.ParseAccount("tNULSeBaMoG1oaW1JZnh6Ly65Ttp6raeTFBfCG")
-	//balanceInfo, _ := sdk.GetNRC20Balance(acc.Address, "tNULSeBaN8nYn6u6GCNcLQcozy7mS94swraJzh")
-	accountInfo, _ := sdk.GetBalance(acc.Address, 2, 1)
+
+	SimpleCallContractTx(sdk, "", "tNULSeBaN8nYn6u6GCNcLQcozy7mS94swraJzh", "transfer", [][]string{[]string{"tNULSeBaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD"}, []string{"200000000"}})
+
+}
+
+func SimpleCallContractTx(sdk *nuls.NulsSdk, prikeyHex string, contractAddress string, methodName string, args [][]string) {
+	chainId := uint16(2)
+	assetsId := uint16(1)
+	realAcc, _ := account.GetAccountFromPrkey(prikeyHex, chainId, "tNULS")
+	accountInfo, _ := sdk.GetBalance(realAcc.Address, chainId, assetsId)
 
 	tx := txprotocal.Transaction{
 		TxType:   txprotocal.TX_TYPE_CALL_CONTRACT,
 		Time:     uint32(time.Now().Unix()),
-		Remark:   []byte("golang test"),
+		Remark:   nil,
 		Extend:   nil,
 		CoinData: nil,
 		SignData: nil,
 	}
 
 	ccData := txdata.CallContract{
-		Sender:          acc.AddressBytes,
-		ContractAddress: account.AddressStrToBytes("tNULSeBaN8nYn6u6GCNcLQcozy7mS94swraJzh"),
+		Sender:          realAcc.AddressBytes,
+		ContractAddress: account.AddressStrToBytes(contractAddress),
 		Value:           big.NewInt(0),
-		GasLimit:        50000,
+		GasLimit:        100000,
 		Price:           25,
-		MethodName:      "transfer",
+		MethodName:      methodName,
 		MethodDesc:      "",
-		ArgsCount:       2,
-		Args:            [][]string{[]string{"tNULSeBaMnrs6JKrCy6TQdzYJZkMZJDng7QAsD"}, []string{"100000000"}},
+		ArgsCount:       uint8(len(args)),
+		Args:            args,
 	}
 	tx.Extend, _ = ccData.Serialize()
 	coinData := txprotocal.CoinData{
 		Froms: []txprotocal.CoinFrom{{
 			Coin: txprotocal.Coin{
-				Address:       acc.AddressBytes,
-				AssetsChainId: 2,
-				AssetsId:      1,
-				Amount:        big.NewInt(1350000),
+				Address:       realAcc.AddressBytes,
+				AssetsChainId: chainId,
+				AssetsId:      assetsId,
+				Amount:        big.NewInt(2600000),
 			},
 			Nonce:  accountInfo.Nonce,
 			Locked: 0,
@@ -55,9 +62,6 @@ func main() {
 		Tos: nil,
 	}
 	tx.CoinData, _ = coinData.Serialize()
-
-	realAcc, _ := account.GetAccountFromPrkey("", 2, "tNULS")
-
 	hash, _ := tx.GetHash().Serialize()
 	signValue, _ := realAcc.Sign(hash)
 

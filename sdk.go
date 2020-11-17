@@ -43,7 +43,7 @@ func NewNulsSdk(apiUrl string, psUrl string, chainId uint16) *NulsSdk {
 }
 
 //获取账户对应资产的余额
-func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId int) (*api.AccountStatus, error) {
+func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId uint16) (*api.AccountStatus, error) {
 	return api.GetAccountInfo(sdk.apiClient, address, sdk.chainId, assetsChainId, assetsId)
 }
 
