@@ -53,11 +53,11 @@ func (sdk *NulsSdk) GetNRC20Balance(address, contractAddress string) (*api.Token
 	return api.GetNRC20Balance(sdk.apiClient, sdk.chainId, address, contractAddress)
 }
 
-func (sdk *NulsSdk) ImputedContractCallGas(client *jsonrpc.NulsApiClient, chainId uint16, txData *txdata.CallContract) (float64, error) {
-	return api.ImputedContractCallGas(client, chainId, txData)
+func (sdk *NulsSdk) ImputedContractCallGas(chainId uint16, txData *txdata.CallContract) (float64, error) {
+	return api.ImputedContractCallGas(sdk.apiClient, chainId, txData)
 }
-func (sdk *NulsSdk) SCMethodInvokeView(client *jsonrpc.NulsApiClient, chainId uint16, contractAddress, methodName, methodDesc string, args [][]string) (map[string]interface{}, error) {
-	return api.SCMethodInvokeView(client, chainId, contractAddress, methodName, methodDesc, args)
+func (sdk *NulsSdk) SCMethodInvokeView(chainId uint16, contractAddress, methodName, methodDesc string, args [][]string) (map[string]interface{}, error) {
+	return api.SCMethodInvokeView(sdk.apiClient, chainId, contractAddress, methodName, methodDesc, args)
 }
 
 //获取api节点的网络连接状况

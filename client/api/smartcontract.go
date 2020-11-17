@@ -64,11 +64,11 @@ func ImputedContractCallGas(client *jsonrpc.NulsApiClient, chainId uint16, txDat
 }
 
 func SCMethodInvokeView(client *jsonrpc.NulsApiClient, chainId uint16, contractAddress, methodName, methodDesc string, args [][]string) (map[string]interface{}, error) {
-	if client == nil || contractAddress == "" || methodName == "" || methodDesc == "" {
+	if client == nil || contractAddress == "" || methodName == "" {
 		return nil, errors.New("parameter wrong.")
 	}
 	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "imputedContractCallGas", []interface{}{chainId, contractAddress, methodName, methodDesc, args})
+	param := jsonrpc.NewRequestParam(rand.Intn(10000), "invokeView", []interface{}{chainId, contractAddress, methodName, methodDesc, args})
 	result, err := client.ApiRequest(param)
 	if err != nil {
 		return nil, err
