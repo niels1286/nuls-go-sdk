@@ -47,6 +47,11 @@ func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId int) (*ap
 	return api.GetAccountInfo(sdk.apiClient, address, sdk.chainId, assetsChainId, assetsId)
 }
 
+//获取账户对应资产的余额
+func (sdk *NulsSdk) GetNRC20Balance(address, contractAddress string) (*api.TokenBalance, error) {
+	return api.GetNRC20Balance(sdk.apiClient, sdk.chainId, address, contractAddress)
+}
+
 //获取api节点的网络连接状况
 func (sdk *NulsSdk) GetNetworkInfo() (*api.NetworkInfo, error) {
 	return api.GetNetworkInfo(sdk.apiClient)
