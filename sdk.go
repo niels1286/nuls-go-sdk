@@ -30,6 +30,7 @@ import (
 	"github.com/niels1286/nuls-go-sdk/client/jsonrpc"
 	"github.com/niels1286/nuls-go-sdk/client/ps"
 	txprotocal "github.com/niels1286/nuls-go-sdk/tx/protocal"
+	"github.com/niels1286/nuls-go-sdk/tx/txdata"
 )
 
 type NulsSdk struct {
@@ -50,6 +51,13 @@ func (sdk *NulsSdk) GetBalance(address string, assetsChainId, assetsId uint16) (
 //获取账户对应资产的余额
 func (sdk *NulsSdk) GetNRC20Balance(address, contractAddress string) (*api.TokenBalance, error) {
 	return api.GetNRC20Balance(sdk.apiClient, sdk.chainId, address, contractAddress)
+}
+
+func (sdk *NulsSdk) ImputedContractCallGas(client *jsonrpc.NulsApiClient, chainId uint16, txData *txdata.CallContract) (float64, error) {
+	return api.ImputedContractCallGas(client, chainId, txData)
+}
+func (sdk *NulsSdk) SCMethodInvokeView(client *jsonrpc.NulsApiClient, chainId uint16, contractAddress, methodName, methodDesc string, args [][]string) (map[string]interface{}, error) {
+	return api.SCMethodInvokeView(client, chainId, contractAddress, methodName, methodDesc, args)
 }
 
 //获取api节点的网络连接状况

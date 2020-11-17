@@ -89,39 +89,3 @@ func GetAccountInfo(client *jsonrpc.NulsApiClient, address string, chainId uint1
 		TotalBalance: totalBalance,
 	}, nil
 }
-
-func GetNRC20Balance(client *jsonrpc.NulsApiClient, chainId uint16, address, contractAddress string) (*TokenBalance, error) {
-	if client == nil || address == "" {
-		return nil, errors.New("parameter wrong.")
-	}
-	rand.Seed(time.Now().Unix())
-	param := jsonrpc.NewRequestParam(rand.Intn(10000), "getTokenBalance", []interface{}{chainId, contractAddress, address})
-	result, err := client.ApiRequest(param)
-	if err != nil {
-		return nil, err
-	}
-	if nil == result || nil == result.Result {
-		return nil, errors.New("Get nil result.")
-	}
-	resultMap := result.Result.(map[string]interface{})
-	balance, err := mathutils.StringToBigInt(resultMap["amount"].(string))
-	if err != nil {
-		return nil, err
-	}
-	name := resultMap["name"].(string)
-	symbol := resultMap["symbol"].(string)
-	decimals := resultMap["decimals"].(float64)
-	status := resultMap["status"].(float64)
-
-	if err != nil {
-		return nil, err
-	}
-	return &TokenBalance{
-		ContractAddress: contractAddress,
-		Name:            name,
-		Symbol:          symbol,
-		Amount:          balance,
-		Decimals:        int64(decimals),
-		Status:          int(status),
-	}, nil
-}
