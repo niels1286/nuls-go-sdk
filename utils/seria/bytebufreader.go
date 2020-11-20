@@ -68,7 +68,7 @@ func (reader *ByteBufReader) ReadBytes(length int) ([]byte, error) {
 	}
 	bytes := reader.payload[reader.cursor : reader.cursor+length]
 	reader.cursor += length
-	return bytes, nil
+	return append([]byte{}, bytes...), nil
 }
 
 //从字节序列中读取一个uint16,2个字节
